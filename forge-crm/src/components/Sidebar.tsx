@@ -39,7 +39,7 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
-    <aside className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[272px]'}`}
+    <aside className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[280px]'}`}
       style={{ background: 'linear-gradient(180deg, #061525 0%, #0F2A4A 50%, #132f52 100%)' }}>
 
       {/* Logo */}

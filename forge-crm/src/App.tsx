@@ -32,7 +32,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-forge-bg">
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
-      <main className={`flex-1 transition-all duration-300 min-h-screen ${collapsed ? 'ml-[72px]' : 'ml-[272px]'}`}>
+      <main className={`flex-1 transition-all duration-300 min-h-screen ${collapsed ? 'ml-[72px]' : 'ml-[280px]'}`}>
         <TopBar title={page.title} breadcrumb={page.breadcrumb} />
         <div className="p-6 lg:p-8 animate-fadeIn" key={location.pathname}>
           <Routes>
