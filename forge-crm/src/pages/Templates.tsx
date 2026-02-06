@@ -7,8 +7,8 @@ import {
   Settings,
   Layers,
   BarChart3,
-} from 'lucide-react';
-import { templates } from '../data/mockData';
+} from 'lucide-react'
+import { templates } from '../data/mockData'
 
 const iconConfig: Record<string, { icon: React.ReactNode; gradient: string }> = {
   assess: {
@@ -35,17 +35,17 @@ const iconConfig: Record<string, { icon: React.ReactNode; gradient: string }> = 
     icon: <Settings size={26} className="text-white" />,
     gradient: 'bg-gradient-to-br from-forge-warning to-forge-warning/70',
   },
-};
+}
 
 export default function Templates() {
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid grid-cols-3 gap-6 stagger-children">
       {templates.map((template) => {
-        const config = iconConfig[template.iconType];
+        const config = iconConfig[template.iconType]
         return (
           <div
             key={template.name}
-            className="group bg-white rounded-2xl border border-forge-border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-forge-teal cursor-pointer"
+            className="group bg-forge-card rounded-2xl border border-forge-border overflow-hidden card-glow cursor-pointer animate-slideUp"
           >
             {/* Accent Bar */}
             <div
@@ -57,19 +57,12 @@ export default function Templates() {
 
             {/* Content */}
             <div className="p-6">
-              {/* Icon */}
-              <div
-                className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${config.gradient}`}
-              >
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${config.gradient}`}>
                 {config.icon}
               </div>
-
-              {/* Name */}
-              <h3 className="font-heading font-bold text-base text-forge-navy mb-2">
+              <h3 className="font-heading font-bold text-base text-forge-text mb-2">
                 {template.name}
               </h3>
-
-              {/* Description */}
               <p className="text-[13px] text-forge-text-muted leading-relaxed mb-5">
                 {template.desc}
               </p>
@@ -89,8 +82,8 @@ export default function Templates() {
               </span>
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

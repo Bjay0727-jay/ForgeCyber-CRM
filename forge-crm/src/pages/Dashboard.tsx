@@ -7,37 +7,39 @@ import {
   PlusCircle,
   RefreshCw,
   AlertTriangle,
-} from 'lucide-react';
-import { dashboardStats, engagements, activities } from '../data/mockData';
-import Badge from '../components/Badge';
-import Card from '../components/Card';
+  TrendingUp,
+  TrendingDown,
+} from 'lucide-react'
+import { dashboardStats, engagements, activities } from '../data/mockData'
+import Badge from '../components/Badge'
+import Card from '../components/Card'
 
 const iconMap: Record<string, React.ReactNode> = {
   users: <Users size={24} />,
   'clipboard-check': <ClipboardCheck size={24} />,
   'file-text': <FileText size={24} />,
   'dollar-sign': <DollarSign size={24} />,
-};
+}
 
 const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = {
   complete: { icon: <CheckCircle2 size={18} />, color: 'text-forge-teal bg-forge-teal-glow' },
   create: { icon: <PlusCircle size={18} />, color: 'text-forge-success bg-forge-success/10' },
   update: { icon: <RefreshCw size={18} />, color: 'text-forge-info bg-forge-info/10' },
   alert: { icon: <AlertTriangle size={18} />, color: 'text-forge-danger bg-forge-danger/10' },
-};
+}
 
 export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-4 gap-6 stagger-children">
         {dashboardStats.map((stat) => (
           <div
             key={stat.label}
-            className={`rounded-2xl p-6 transition-all duration-300 ${
+            className={`rounded-2xl p-6 animate-slideUp ${
               stat.highlight
-                ? 'bg-gradient-to-br from-forge-navy to-forge-navy-light text-white shadow-lg'
-                : 'bg-white border border-forge-border hover:-translate-y-1 hover:shadow-lg hover:border-forge-teal'
+                ? 'bg-gradient-to-br from-forge-navy to-forge-navy-light text-white shadow-lg shadow-forge-navy/20'
+                : 'bg-forge-card border border-forge-border card-glow'
             }`}
           >
             <div className="flex items-start justify-between mb-4">
@@ -50,6 +52,14 @@ export default function Dashboard() {
               >
                 {iconMap[stat.icon]}
               </div>
+              {stat.positive !== null && (
+                <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg ${
+                  stat.positive ? 'bg-forge-success/10 text-forge-success' : 'bg-forge-danger/10 text-forge-danger'
+                }`}>
+                  {stat.positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                  {stat.change.split(' ')[0]}
+                </div>
+              )}
             </div>
             <p
               className={`text-sm mb-1 ${
@@ -65,15 +75,9 @@ export default function Dashboard() {
               className={`text-xs mt-2 ${
                 stat.highlight
                   ? 'text-white/60'
-                  : stat.positive
-                    ? 'text-forge-success'
-                    : stat.positive === false
-                      ? 'text-forge-danger'
-                      : 'text-forge-text-muted'
+                  : 'text-forge-text-muted'
               }`}
             >
-              {stat.positive === true && '\u2191 '}
-              {stat.positive === false && '\u2193 '}
               {stat.change}
             </p>
           </div>
@@ -83,65 +87,63 @@ export default function Dashboard() {
       {/* Content Grid */}
       <div className="grid gap-6" style={{ gridTemplateColumns: '2fr 1fr' }}>
         {/* Active Engagements */}
-        <Card title="Active Engagements">
-          <div className="-m-6">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-forge-bg">
-                  <th className="text-left uppercase text-xs font-semibold text-forge-text-muted py-3 px-4">
-                    Customer
-                  </th>
-                  <th className="text-left uppercase text-xs font-semibold text-forge-text-muted py-3 px-4">
-                    Type
-                  </th>
-                  <th className="text-left uppercase text-xs font-semibold text-forge-text-muted py-3 px-4">
-                    Status
-                  </th>
-                  <th className="text-left uppercase text-xs font-semibold text-forge-text-muted py-3 px-4">
-                    Consultant
-                  </th>
-                  <th className="text-left uppercase text-xs font-semibold text-forge-text-muted py-3 px-4">
-                    Due Date
-                  </th>
+        <Card title="Active Engagements" glow noPadding>
+          <table className="w-full">
+            <thead>
+              <tr className="bg-forge-bg-subtle">
+                <th className="text-left uppercase text-[11px] font-semibold text-forge-text-muted py-3 px-4 tracking-wider">
+                  Customer
+                </th>
+                <th className="text-left uppercase text-[11px] font-semibold text-forge-text-muted py-3 px-4 tracking-wider">
+                  Type
+                </th>
+                <th className="text-left uppercase text-[11px] font-semibold text-forge-text-muted py-3 px-4 tracking-wider">
+                  Status
+                </th>
+                <th className="text-left uppercase text-[11px] font-semibold text-forge-text-muted py-3 px-4 tracking-wider">
+                  Consultant
+                </th>
+                <th className="text-left uppercase text-[11px] font-semibold text-forge-text-muted py-3 px-4 tracking-wider">
+                  Due Date
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {engagements.map((eng) => (
+                <tr
+                  key={eng.customer}
+                  className="border-b border-forge-border hover:bg-forge-teal/[0.03] transition-colors"
+                >
+                  <td className="py-4 px-4 font-semibold text-forge-text text-sm">
+                    {eng.customer}
+                  </td>
+                  <td className="py-4 px-4 text-sm text-forge-text-muted">
+                    {eng.type}
+                  </td>
+                  <td className="py-4 px-4">
+                    <Badge variant={eng.statusType} dot>
+                      {eng.status}
+                    </Badge>
+                  </td>
+                  <td className="py-4 px-4 text-sm text-forge-text-muted">
+                    {eng.consultant}
+                  </td>
+                  <td className="py-4 px-4 text-sm text-forge-text-muted">
+                    {eng.dueDate}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {engagements.map((eng) => (
-                  <tr
-                    key={eng.customer}
-                    className="border-b border-forge-border hover:bg-forge-teal/[0.03] transition-colors"
-                  >
-                    <td className="py-4 px-4 font-semibold text-forge-navy text-sm">
-                      {eng.customer}
-                    </td>
-                    <td className="py-4 px-4 text-sm text-forge-text-muted">
-                      {eng.type}
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge variant={eng.statusType} dot>
-                        {eng.status}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4 text-sm text-forge-text-muted">
-                      {eng.consultant}
-                    </td>
-                    <td className="py-4 px-4 text-sm text-forge-text-muted">
-                      {eng.dueDate}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </Card>
 
         {/* Recent Activity */}
-        <Card title="Recent Activity">
+        <Card title="Recent Activity" glow>
           <div className="space-y-5">
             {activities.map((activity, idx) => {
-              const style = activityIcons[activity.type];
+              const style = activityIcons[activity.type]
               return (
-                <div key={idx} className="flex items-start gap-3">
+                <div key={idx} className="flex items-start gap-3 animate-slideUp" style={{ animationDelay: `${idx * 80}ms` }}>
                   <div
                     className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${style.color}`}
                   >
@@ -157,11 +159,11 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </Card>
       </div>
     </div>
-  );
+  )
 }

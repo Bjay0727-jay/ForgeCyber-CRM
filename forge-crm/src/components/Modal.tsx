@@ -1,16 +1,16 @@
-import type { ReactNode } from 'react';
-import { X } from 'lucide-react';
+import type { ReactNode } from 'react'
+import { X } from 'lucide-react'
 
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: ReactNode;
-  footer?: ReactNode;
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: ReactNode
+  footer?: ReactNode
 }
 
 export default function Modal({ isOpen, onClose, title, children, footer }: ModalProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div
@@ -18,21 +18,21 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Moda
       onClick={onClose}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-forge-navy/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-forge-navy/60 backdrop-blur-md" />
 
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-[900px] max-h-[90vh] mx-4 bg-white rounded-2xl shadow-2xl flex flex-col animate-fadeIn"
+        className="relative w-full max-w-[900px] max-h-[90vh] mx-4 bg-forge-card rounded-2xl shadow-2xl border border-forge-border flex flex-col animate-fadeInScale"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-forge-border flex-shrink-0">
-          <h2 className="font-heading text-xl font-bold text-forge-navy">
+          <h2 className="font-heading text-xl font-bold text-forge-text">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-forge-text-muted hover:bg-forge-bg hover:text-forge-text transition-colors"
+            className="p-2 rounded-xl text-forge-text-muted hover:bg-forge-bg-subtle hover:text-forge-text transition-colors"
           >
             <X size={20} />
           </button>
@@ -51,5 +51,5 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Moda
         )}
       </div>
     </div>
-  );
+  )
 }
