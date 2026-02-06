@@ -1,0 +1,59 @@
+# Forge Service Delivery Portal - Docker Compose Configuration
+# Usage: docker-compose up -d
+
+version: '3.8'
+
+services:
+  forge-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: forge-portal:1.0
+    container_name: forge-service-delivery-portal
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - forge-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.forge.service=service-delivery-portal"
+      - "com.forge.environment=production"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Nginx reverse proxy with SSL termination
+  # Uncomment below if you need SSL support
+  #
+  # nginx-proxy:
+  #   image: nginx:1.25-alpine
+  #   container_name: forge-nginx-proxy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./config/nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - ./certs:/etc/nginx/certs:ro
+  #   depends_on:
+  #     - forge-portal
+  #   networks:
+  #     - forge-network
+  #   restart: unless-stopped
+
+networks:
+  forge-network:
+    name: forge-network
+    driver: bridge
+
+# Optional: Named volumes for persistent data
+# volumes:
+#   forge-data:
+#     name: forge-portal-data

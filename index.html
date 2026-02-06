@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forge MSSP | Service Delivery Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --forge-navy: #0F2A4A;
+      --forge-navy-deep: #081929;
+      --forge-navy-light: #1a3a5c;
+      --forge-teal: #0D9488;
+      --forge-teal-light: #14b8a6;
+      --forge-teal-glow: rgba(13, 148, 136, 0.15);
+      --forge-slate: #1e293b;
+      --forge-slate-light: #334155;
+      --forge-bg: #f8fafc;
+      --forge-card: #ffffff;
+      --forge-border: #e2e8f0;
+      --forge-text: #0f172a;
+      --forge-text-muted: #64748b;
+      --forge-success: #10b981;
+      --forge-warning: #f59e0b;
+      --forge-danger: #ef4444;
+      --forge-info: #3b82f6;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--forge-bg);
+      color: var(--forge-text);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       SIDEBAR NAVIGATION
+    ═══════════════════════════════════════════════════════════════ */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, var(--forge-navy-deep) 0%, var(--forge-navy) 100%);
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(13, 148, 136, 0.2);
+    }
+    
+    .sidebar-header {
+      padding: 24px 20px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo-icon {
+      width: 140px;
+      height: 140px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+    
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .logo-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    
+    .logo-sub {
+      font-size: 13px;
+      color: var(--forge-teal-light);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    
+    .nav-section {
+      padding: 20px 12px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .nav-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+      margin-top: 20px;
+    }
+    
+    .nav-label:first-child { margin-top: 0; }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255,255,255,0.06);
+      color: white;
+    }
+    
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--forge-teal) 0%, rgba(13, 148, 136, 0.8) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+    
+    .nav-item.active svg { opacity: 1; }
+    
+    .nav-badge {
+      margin-left: auto;
+      background: var(--forge-danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--forge-teal) 0%, var(--forge-navy-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .user-info {
+      flex: 1;
+    }
+    
+    .user-name {
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      color: var(--forge-teal-light);
+      font-size: 12px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+    ═══════════════════════════════════════════════════════════════ */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .top-bar {
+      background: white;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--forge-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    
+    .page-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--forge-navy);
+    }
+    
+    .page-breadcrumb {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+      margin-top: 4px;
+    }
+    
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--forge-bg);
+      border: 1px solid var(--forge-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      width: 300px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      color: var(--forge-text);
+      outline: none;
+    }
+    
+    .search-box svg {
+      width: 18px;
+      height: 18px;
+      color: var(--forge-text-muted);
+    }
+    
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--forge-border);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .icon-btn:hover {
+      background: var(--forge-bg);
+      border-color: var(--forge-teal);
+    }
+    
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+      color: var(--forge-text-muted);
+    }
+    
+    .notification-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: var(--forge-danger);
+      border-radius: 50%;
+    }
+    
+    .content-area {
+      padding: 32px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       PAGE SECTIONS (SHOW/HIDE)
+    ═══════════════════════════════════════════════════════════════ */
+    .page-section {
+      display: none;
+    }
+    
+    .page-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       DASHBOARD CARDS & STATS
+    ═══════════════════════════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--forge-border);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+      border-color: var(--forge-teal);
+    }
+    
+    .stat-card.highlight {
+      background: linear-gradient(135deg, var(--forge-navy) 0%, var(--forge-navy-light) 100%);
+      border: none;
+    }
+    
+    .stat-card.highlight .stat-label,
+    .stat-card.highlight .stat-value,
+    .stat-card.highlight .stat-change { color: white; }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .stat-icon.teal { background: var(--forge-teal-glow); color: var(--forge-teal); }
+    .stat-icon.navy { background: rgba(15, 42, 74, 0.1); color: var(--forge-navy); }
+    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--forge-success); }
+    .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--forge-warning); }
+    .stat-icon.white { background: rgba(255,255,255,0.15); color: white; }
+    
+    .stat-icon svg { width: 24px; height: 24px; }
+    
+    .stat-label {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--forge-navy);
+      margin-bottom: 8px;
+    }
+    
+    .stat-change {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .stat-change.positive { color: var(--forge-success); }
+    .stat-change.negative { color: var(--forge-danger); }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       CARDS & PANELS
+    ═══════════════════════════════════════════════════════════════ */
+    .card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid var(--forge-border);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--forge-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--forge-navy);
+    }
+    
+    .card-body {
+      padding: 24px;
+    }
+    
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .btn svg { width: 18px; height: 18px; }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--forge-teal) 0%, var(--forge-teal-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: var(--forge-navy);
+      border: 1px solid var(--forge-border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--forge-bg);
+      border-color: var(--forge-teal);
+    }
+    
+    .btn-navy {
+      background: var(--forge-navy);
+      color: white;
+    }
+    
+    .btn-navy:hover {
+      background: var(--forge-navy-light);
+    }
+    
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--forge-teal);
+      padding: 8px 12px;
+    }
+    
+    .btn-ghost:hover {
+      background: var(--forge-teal-glow);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       TABLES
+    ═══════════════════════════════════════════════════════════════ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--forge-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--forge-border);
+      background: var(--forge-bg);
+    }
+    
+    .data-table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--forge-border);
+      font-size: 14px;
+    }
+    
+    .data-table tr:hover {
+      background: rgba(13, 148, 136, 0.03);
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       BADGES & STATUS
+    ═══════════════════════════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--forge-success); }
+    .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--forge-warning); }
+    .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--forge-danger); }
+    .badge-info { background: rgba(59, 130, 246, 0.1); color: var(--forge-info); }
+    .badge-teal { background: var(--forge-teal-glow); color: var(--forge-teal); }
+    .badge-navy { background: rgba(15, 42, 74, 0.1); color: var(--forge-navy); }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-dot.active { background: var(--forge-success); }
+    .status-dot.pending { background: var(--forge-warning); }
+    .status-dot.inactive { background: var(--forge-text-muted); }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       FORMS
+    ═══════════════════════════════════════════════════════════════ */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--forge-navy);
+      margin-bottom: 8px;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--forge-border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Open Sans', sans-serif;
+      color: var(--forge-text);
+      background: white;
+      transition: all 0.2s;
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--forge-teal);
+      box-shadow: 0 0 0 3px var(--forge-teal-glow);
+    }
+    
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       TABS
+    ═══════════════════════════════════════════════════════════════ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--forge-bg);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--forge-text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+    }
+    
+    .tab:hover {
+      color: var(--forge-navy);
+    }
+    
+    .tab.active {
+      background: white;
+      color: var(--forge-teal);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       CRM CUSTOMER LIST
+    ═══════════════════════════════════════════════════════════════ */
+    .customer-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--forge-border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .customer-card:hover {
+      border-color: var(--forge-teal);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    
+    .customer-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--forge-navy) 0%, var(--forge-teal) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    
+    .customer-info {
+      flex: 1;
+    }
+    
+    .customer-name {
+      font-weight: 600;
+      color: var(--forge-navy);
+      margin-bottom: 4px;
+    }
+    
+    .customer-detail {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+    }
+    
+    .customer-meta {
+      text-align: right;
+    }
+    
+    .customer-stage {
+      margin-bottom: 4px;
+    }
+    
+    .customer-date {
+      font-size: 12px;
+      color: var(--forge-text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       PIPELINE VIEW
+    ═══════════════════════════════════════════════════════════════ */
+    .pipeline-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 16px;
+    }
+    
+    .pipeline-column {
+      background: var(--forge-bg);
+      border-radius: 12px;
+      min-width: 260px;
+    }
+    
+    .pipeline-header {
+      padding: 16px;
+      border-bottom: 2px solid;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .pipeline-header.lead { border-color: var(--forge-info); }
+    .pipeline-header.assessment { border-color: var(--forge-warning); }
+    .pipeline-header.proposal { border-color: var(--forge-teal); }
+    .pipeline-header.negotiation { border-color: #8b5cf6; }
+    .pipeline-header.closed { border-color: var(--forge-success); }
+    
+    .pipeline-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--forge-navy);
+    }
+    
+    .pipeline-count {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: white;
+      color: var(--forge-text-muted);
+    }
+    
+    .pipeline-cards {
+      padding: 12px;
+      min-height: 400px;
+    }
+    
+    .pipeline-card {
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid var(--forge-border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pipeline-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .pipeline-card-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--forge-navy);
+      margin-bottom: 8px;
+    }
+    
+    .pipeline-card-meta {
+      font-size: 12px;
+      color: var(--forge-text-muted);
+      margin-bottom: 8px;
+    }
+    
+    .pipeline-card-value {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--forge-teal);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       ASSESSMENT TEMPLATES
+    ═══════════════════════════════════════════════════════════════ */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .template-card {
+      background: white;
+      border: 1px solid var(--forge-border);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .template-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--forge-teal) 0%, var(--forge-teal-light) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .template-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+      border-color: var(--forge-teal);
+    }
+    
+    .template-card:hover::before {
+      opacity: 1;
+    }
+    
+    .template-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .template-icon.assess { background: linear-gradient(135deg, var(--forge-teal) 0%, var(--forge-teal-light) 100%); }
+    .template-icon.report { background: linear-gradient(135deg, var(--forge-navy) 0%, var(--forge-navy-light) 100%); }
+    .template-icon.ops { background: linear-gradient(135deg, var(--forge-warning) 0%, #fbbf24 100%); }
+    .template-icon.compliance { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); }
+    .template-icon.incident { background: linear-gradient(135deg, var(--forge-danger) 0%, #f87171 100%); }
+    .template-icon.onboard { background: linear-gradient(135deg, var(--forge-success) 0%, #34d399 100%); }
+    
+    .template-icon svg { width: 28px; height: 28px; fill: white; }
+    
+    .template-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--forge-navy);
+      margin-bottom: 8px;
+    }
+    
+    .template-desc {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    
+    .template-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--forge-border);
+    }
+    
+    .template-stat {
+      font-size: 12px;
+      color: var(--forge-text-muted);
+    }
+    
+    .template-stat strong {
+      color: var(--forge-navy);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       CONSULTING WORKFLOW
+    ═══════════════════════════════════════════════════════════════ */
+    .workflow-timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    
+    .workflow-timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--forge-teal) 0%, var(--forge-navy) 100%);
+    }
+    
+    .workflow-step {
+      position: relative;
+      padding: 20px 24px;
+      background: white;
+      border: 1px solid var(--forge-border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+    
+    .workflow-step:hover {
+      border-color: var(--forge-teal);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    
+    .workflow-step::before {
+      content: '';
+      position: absolute;
+      left: -33px;
+      top: 24px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--forge-teal);
+      border: 3px solid white;
+      box-shadow: 0 0 0 3px var(--forge-teal-glow);
+    }
+    
+    .workflow-step.completed::before {
+      background: var(--forge-success);
+    }
+    
+    .workflow-step.active::before {
+      background: var(--forge-warning);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 3px var(--forge-teal-glow); }
+      50% { box-shadow: 0 0 0 8px transparent; }
+    }
+    
+    .workflow-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .workflow-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--forge-navy);
+    }
+    
+    .workflow-duration {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+    }
+    
+    .workflow-desc {
+      font-size: 14px;
+      color: var(--forge-text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    
+    .workflow-deliverables {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .deliverable-tag {
+      padding: 6px 12px;
+      background: var(--forge-bg);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--forge-navy);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       ASSESSMENT FORM (MODAL)
+    ═══════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--forge-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--forge-navy);
+    }
+    
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: var(--forge-bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+      background: var(--forge-danger);
+      color: white;
+    }
+    
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .modal-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--forge-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       SECURITY DOMAIN RATING
+    ═══════════════════════════════════════════════════════════════ */
+    .domain-rating-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .domain-rating-card {
+      background: var(--forge-bg);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .domain-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--forge-navy);
+      margin-bottom: 12px;
+    }
+    
+    .rating-scale {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .rating-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--forge-border);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--forge-text-muted);
+      transition: all 0.2s;
+    }
+    
+    .rating-btn:hover {
+      border-color: var(--forge-teal);
+      color: var(--forge-teal);
+    }
+    
+    .rating-btn.selected {
+      background: var(--forge-teal);
+      border-color: var(--forge-teal);
+      color: white;
+    }
+    
+    .rating-btn.critical { background: var(--forge-danger); border-color: var(--forge-danger); color: white; }
+    .rating-btn.low { background: #f97316; border-color: #f97316; color: white; }
+    .rating-btn.partial { background: var(--forge-warning); border-color: var(--forge-warning); color: white; }
+    .rating-btn.adequate { background: var(--forge-info); border-color: var(--forge-info); color: white; }
+    .rating-btn.mature { background: var(--forge-success); border-color: var(--forge-success); color: white; }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       FINDINGS ENTRY
+    ═══════════════════════════════════════════════════════════════ */
+    .findings-list {
+      border: 1px solid var(--forge-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .finding-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--forge-border);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .finding-item:last-child { border-bottom: none; }
+    
+    .finding-severity {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .finding-severity.critical { background: var(--forge-danger); color: white; }
+    .finding-severity.high { background: #f97316; color: white; }
+    .finding-severity.medium { background: var(--forge-warning); color: white; }
+    .finding-severity.low { background: var(--forge-info); color: white; }
+    
+    .finding-content { flex: 1; }
+    
+    .finding-title {
+      font-weight: 600;
+      color: var(--forge-navy);
+      margin-bottom: 4px;
+    }
+    
+    .finding-desc {
+      font-size: 13px;
+      color: var(--forge-text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       ACTIVITY FEED
+    ═══════════════════════════════════════════════════════════════ */
+    .activity-feed {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--forge-border);
+    }
+    
+    .activity-item:last-child { border-bottom: none; }
+    
+    .activity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .activity-icon.create { background: rgba(16, 185, 129, 0.1); color: var(--forge-success); }
+    .activity-icon.update { background: rgba(59, 130, 246, 0.1); color: var(--forge-info); }
+    .activity-icon.complete { background: var(--forge-teal-glow); color: var(--forge-teal); }
+    .activity-icon.alert { background: rgba(239, 68, 68, 0.1); color: var(--forge-danger); }
+    
+    .activity-icon svg { width: 18px; height: 18px; }
+    
+    .activity-content { flex: 1; }
+    
+    .activity-text {
+      font-size: 14px;
+      color: var(--forge-text);
+      margin-bottom: 4px;
+    }
+    
+    .activity-text strong { color: var(--forge-navy); }
+    
+    .activity-time {
+      font-size: 12px;
+      color: var(--forge-text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .template-grid { grid-template-columns: repeat(2, 1fr); }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .template-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════════
+       SIDEBAR NAVIGATION
+  ═══════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <img src="data:image/webp;base64,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" alt="Forge Logo">
+        </div>
+        <div class="logo-text">
+          <span class="logo-sub">Service Delivery Portal</span>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showSection('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      
+      <div class="nav-label">Customer Management</div>
+      <div class="nav-item" onclick="showSection('crm')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        CRM / Pipeline
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item" onclick="showSection('intake')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        New Customer Intake
+      </div>
+      
+      <div class="nav-label">Consulting Services</div>
+      <div class="nav-item" onclick="showSection('assessments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Assessments
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-item" onclick="showSection('workflow')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Consulting Workflow
+      </div>
+      <div class="nav-item" onclick="showSection('templates')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Document Templates
+      </div>
+      
+      <div class="nav-label">Operations</div>
+      <div class="nav-item" onclick="showSection('operations')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Active Engagements
+        <span class="nav-badge">8</span>
+      </div>
+      <div class="nav-item" onclick="showSection('reports')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        Reports & Analytics
+      </div>
+      
+      <div class="nav-label">Admin</div>
+      <div class="nav-item" onclick="showSection('team')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM18.5 19.5c0-2.5-3-4-6.5-4s-6.5 1.5-6.5 4"/></svg>
+        Team Management
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">SC</div>
+        <div class="user-info">
+          <div class="user-name">Stan Chen</div>
+          <div class="user-role">Senior Consultant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════════════ -->
+  <main class="main-content">
+    <header class="top-bar">
+      <div>
+        <h1 class="page-title" id="pageTitle">Service Delivery Dashboard</h1>
+        <p class="page-breadcrumb" id="pageBreadcrumb">Home / Dashboard</p>
+      </div>
+      <div class="top-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search customers, assessments...">
+        </div>
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notification-dot"></span>
+        </button>
+        <button class="btn btn-primary" onclick="openModal('newCustomer')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Customer
+        </button>
+      </div>
+    </header>
+    
+    <div class="content-area">
+      <!-- ═══════════════════════════════════════════════════════════════
+           DASHBOARD SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="dashboard" class="page-section active">
+        <div class="stats-grid">
+          <div class="stat-card highlight">
+            <div class="stat-icon white">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-label">Active Customers</div>
+            <div class="stat-value">24</div>
+            <div class="stat-change positive">↑ 12% from last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="stat-label">Assessments In Progress</div>
+            <div class="stat-value">8</div>
+            <div class="stat-change">4 due this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="stat-label">Reports Pending</div>
+            <div class="stat-value">6</div>
+            <div class="stat-change negative">↓ 2 overdue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="stat-label">Pipeline Value</div>
+            <div class="stat-value">$1.2M</div>
+            <div class="stat-change positive">↑ 18% growth</div>
+          </div>
+        </div>
+        
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Active Engagements</h3>
+              <button class="btn btn-sm btn-secondary">View All</button>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Engagement Type</th>
+                    <th>Status</th>
+                    <th>Consultant</th>
+                    <th>Due Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Raytheon Intelligence</strong></td>
+                    <td>CMMC 2.0 Assessment</td>
+                    <td><span class="badge badge-warning"><span class="status-dot pending"></span> In Progress</span></td>
+                    <td>Michael Torres</td>
+                    <td>Jan 15, 2026</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Texas Health Resources</strong></td>
+                    <td>HIPAA Gap Analysis</td>
+                    <td><span class="badge badge-success"><span class="status-dot active"></span> On Track</span></td>
+                    <td>Sarah Mitchell</td>
+                    <td>Jan 22, 2026</td>
+                  </tr>
+                  <tr>
+                    <td><strong>First National Bank</strong></td>
+                    <td>Penetration Test</td>
+                    <td><span class="badge badge-info"><span class="status-dot active"></span> Testing</span></td>
+                    <td>James Wilson</td>
+                    <td>Jan 18, 2026</td>
+                  </tr>
+                  <tr>
+                    <td><strong>DOD Contractor Alpha</strong></td>
+                    <td>RMF Assessment</td>
+                    <td><span class="badge badge-danger"><span class="status-dot pending"></span> Blocked</span></td>
+                    <td>Emily Chen</td>
+                    <td>Jan 12, 2026</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Activity</h3>
+            </div>
+            <div class="card-body">
+              <div class="activity-feed">
+                <div class="activity-item">
+                  <div class="activity-icon complete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>Security Posture Assessment</strong> completed for Texas Health</div>
+                    <div class="activity-time">2 hours ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon create">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-text">New customer <strong>Lockheed Martin</strong> added to pipeline</div>
+                    <div class="activity-time">4 hours ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon update">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>POA&M Report</strong> updated for Raytheon</div>
+                    <div class="activity-time">Yesterday at 3:45 PM</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon alert">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>3 Critical Findings</strong> identified in First National pen test</div>
+                    <div class="activity-time">Yesterday at 11:20 AM</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           CRM / PIPELINE SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="crm" class="page-section">
+        <div class="tabs">
+          <button class="tab active" onclick="switchCrmView('pipeline')">Pipeline View</button>
+          <button class="tab" onclick="switchCrmView('list')">Customer List</button>
+          <button class="tab" onclick="switchCrmView('opportunities')">Opportunities</button>
+        </div>
+        
+        <div id="pipeline-view" class="tab-content active">
+          <div class="pipeline-container">
+            <div class="pipeline-column">
+              <div class="pipeline-header lead">
+                <span class="pipeline-title">Lead</span>
+                <span class="pipeline-count">4</span>
+              </div>
+              <div class="pipeline-cards">
+                <div class="pipeline-card" onclick="openModal('customerDetail')">
+                  <div class="pipeline-card-title">Northrop Grumman</div>
+                  <div class="pipeline-card-meta">Defense Contractor • Initial Contact</div>
+                  <div class="pipeline-card-value">$150,000</div>
+                </div>
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">MD Anderson Cancer</div>
+                  <div class="pipeline-card-meta">Healthcare • Referral</div>
+                  <div class="pipeline-card-value">$85,000</div>
+                </div>
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Capital One</div>
+                  <div class="pipeline-card-meta">Financial • Website Inquiry</div>
+                  <div class="pipeline-card-value">$120,000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pipeline-column">
+              <div class="pipeline-header assessment">
+                <span class="pipeline-title">Assessment</span>
+                <span class="pipeline-count">3</span>
+              </div>
+              <div class="pipeline-cards">
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Lockheed Martin</div>
+                  <div class="pipeline-card-meta">Defense • CMMC Gap Assessment</div>
+                  <div class="pipeline-card-value">$275,000</div>
+                </div>
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Baylor Scott & White</div>
+                  <div class="pipeline-card-meta">Healthcare • Security Assessment</div>
+                  <div class="pipeline-card-value">$95,000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pipeline-column">
+              <div class="pipeline-header proposal">
+                <span class="pipeline-title">Proposal</span>
+                <span class="pipeline-count">2</span>
+              </div>
+              <div class="pipeline-cards">
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">General Dynamics IT</div>
+                  <div class="pipeline-card-meta">Defense • ForgeSOC + Comply</div>
+                  <div class="pipeline-card-value">$420,000</div>
+                </div>
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Parkland Health</div>
+                  <div class="pipeline-card-meta">Healthcare • Full Platform</div>
+                  <div class="pipeline-card-value">$185,000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pipeline-column">
+              <div class="pipeline-header negotiation">
+                <span class="pipeline-title">Negotiation</span>
+                <span class="pipeline-count">2</span>
+              </div>
+              <div class="pipeline-cards">
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Raytheon Intelligence</div>
+                  <div class="pipeline-card-meta">Defense • Enterprise License</div>
+                  <div class="pipeline-card-value">$580,000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pipeline-column">
+              <div class="pipeline-header closed">
+                <span class="pipeline-title">Closed Won</span>
+                <span class="pipeline-count">5</span>
+              </div>
+              <div class="pipeline-cards">
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">Texas Health Resources</div>
+                  <div class="pipeline-card-meta">Healthcare • 3-Year Contract</div>
+                  <div class="pipeline-card-value">$245,000</div>
+                </div>
+                <div class="pipeline-card">
+                  <div class="pipeline-card-title">First National Bank</div>
+                  <div class="pipeline-card-meta">Financial • Annual Retainer</div>
+                  <div class="pipeline-card-value">$165,000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="list-view" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">All Customers</h3>
+              <div style="display:flex;gap:12px;">
+                <select class="form-select" style="width:auto;">
+                  <option>All Sectors</option>
+                  <option>Defense</option>
+                  <option>Healthcare</option>
+                  <option>Financial</option>
+                  <option>Government</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="openModal('newCustomer')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add Customer
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="customer-card">
+                <div class="customer-avatar">RT</div>
+                <div class="customer-info">
+                  <div class="customer-name">Raytheon Intelligence</div>
+                  <div class="customer-detail">Defense Contractor • Arlington, VA • CMMC Level 2</div>
+                </div>
+                <div class="customer-meta">
+                  <span class="badge badge-warning customer-stage">Negotiation</span>
+                  <div class="customer-date">Last Contact: Jan 8, 2026</div>
+                </div>
+              </div>
+              <div class="customer-card">
+                <div class="customer-avatar">TH</div>
+                <div class="customer-info">
+                  <div class="customer-name">Texas Health Resources</div>
+                  <div class="customer-detail">Healthcare • Dallas, TX • HIPAA Compliance</div>
+                </div>
+                <div class="customer-meta">
+                  <span class="badge badge-success customer-stage">Active Client</span>
+                  <div class="customer-date">Last Contact: Jan 9, 2026</div>
+                </div>
+              </div>
+              <div class="customer-card">
+                <div class="customer-avatar">LM</div>
+                <div class="customer-info">
+                  <div class="customer-name">Lockheed Martin</div>
+                  <div class="customer-detail">Defense Contractor • Fort Worth, TX • NIST 800-171</div>
+                </div>
+                <div class="customer-meta">
+                  <span class="badge badge-info customer-stage">Assessment</span>
+                  <div class="customer-date">Last Contact: Jan 7, 2026</div>
+                </div>
+              </div>
+              <div class="customer-card">
+                <div class="customer-avatar">FN</div>
+                <div class="customer-info">
+                  <div class="customer-name">First National Bank</div>
+                  <div class="customer-detail">Financial Services • Houston, TX • SOX/PCI-DSS</div>
+                </div>
+                <div class="customer-meta">
+                  <span class="badge badge-success customer-stage">Active Client</span>
+                  <div class="customer-date">Last Contact: Jan 6, 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           NEW CUSTOMER INTAKE SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="intake" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">New Customer Intake Form</h3>
+          </div>
+          <div class="card-body">
+            <div style="margin-bottom:32px;">
+              <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Organization Information</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Organization Name *</label>
+                  <input type="text" class="form-input" placeholder="Enter organization name">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Industry Sector *</label>
+                  <select class="form-select">
+                    <option value="">Select sector...</option>
+                    <option>Defense / DOD Contractor</option>
+                    <option>Federal Government</option>
+                    <option>Healthcare</option>
+                    <option>Financial Services</option>
+                    <option>State/Local Government</option>
+                    <option>Critical Infrastructure</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-input" placeholder="Street address">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">City, State, ZIP</label>
+                  <input type="text" class="form-input" placeholder="City, State ZIP">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Website</label>
+                  <input type="url" class="form-input" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Approximate Employee Count</label>
+                  <select class="form-select">
+                    <option value="">Select range...</option>
+                    <option>1-50</option>
+                    <option>51-200</option>
+                    <option>201-500</option>
+                    <option>501-1000</option>
+                    <option>1001-5000</option>
+                    <option>5000+</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom:32px;">
+              <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Primary Contact</h4>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label">Contact Name *</label>
+                  <input type="text" class="form-input" placeholder="Full name">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Title / Role</label>
+                  <input type="text" class="form-input" placeholder="e.g., CISO, IT Director">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email *</label>
+                  <input type="email" class="form-input" placeholder="email@company.com">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input type="tel" class="form-input" placeholder="(xxx) xxx-xxxx">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Preferred Contact Method</label>
+                  <select class="form-select">
+                    <option>Email</option>
+                    <option>Phone</option>
+                    <option>Teams/Zoom</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom:32px;">
+              <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Compliance & Security Requirements</h4>
+              <div class="form-group">
+                <label class="form-label">Applicable Compliance Frameworks (Select all that apply)</label>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> CMMC 2.0
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> NIST 800-53
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> NIST 800-171
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> FedRAMP
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> HIPAA
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> PCI-DSS
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> SOX
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox"> SOC 2
+                  </label>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Current Security Tools/Platforms</label>
+                  <textarea class="form-textarea" placeholder="List current SIEM, EDR, vulnerability scanner, GRC tools, etc."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Primary Security Challenges</label>
+                  <textarea class="form-textarea" placeholder="What security challenges are you currently facing?"></textarea>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom:32px;">
+              <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Engagement Details</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Services of Interest</label>
+                  <select class="form-select" multiple style="height:120px;">
+                    <option>Security Posture Assessment</option>
+                    <option>CMMC Readiness Assessment</option>
+                    <option>HIPAA Gap Analysis</option>
+                    <option>Penetration Testing</option>
+                    <option>Vulnerability Assessment</option>
+                    <option>ForgeComply 360 Platform</option>
+                    <option>ForgeSOC (Managed Detection)</option>
+                    <option>ForgeRedOps (Offensive Testing)</option>
+                    <option>ISSO/ISSM Support</option>
+                    <option>RMF Support</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Timeline / Urgency</label>
+                  <select class="form-select">
+                    <option>Just exploring options</option>
+                    <option>Need within 30 days</option>
+                    <option>Need within 60 days</option>
+                    <option>Need within 90 days</option>
+                    <option>Urgent - Immediate need</option>
+                  </select>
+                  <div style="margin-top:16px;">
+                    <label class="form-label">Estimated Budget Range</label>
+                    <select class="form-select">
+                      <option>Not sure yet</option>
+                      <option>Under $25,000</option>
+                      <option>$25,000 - $50,000</option>
+                      <option>$50,000 - $100,000</option>
+                      <option>$100,000 - $250,000</option>
+                      <option>$250,000+</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Additional Notes / Context</label>
+                <textarea class="form-textarea" placeholder="Any additional information that would help us understand your needs..."></textarea>
+              </div>
+            </div>
+            
+            <div style="display:flex;gap:12px;justify-content:flex-end;padding-top:24px;border-top:1px solid var(--forge-border);">
+              <button class="btn btn-secondary">Save as Draft</button>
+              <button class="btn btn-primary">Create Customer & Start Assessment</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           ASSESSMENTS SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="assessments" class="page-section">
+        <div class="tabs">
+          <button class="tab active" onclick="switchAssessmentTab('active')">Active Assessments</button>
+          <button class="tab" onclick="switchAssessmentTab('newAssessment')">New Assessment</button>
+          <button class="tab" onclick="switchAssessmentTab('completed')">Completed</button>
+        </div>
+        
+        <div id="active-assessments" class="tab-content active">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">In-Progress Security Assessments</h3>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Assessment Type</th>
+                    <th>Started</th>
+                    <th>Progress</th>
+                    <th>Consultant</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Raytheon Intelligence</strong></td>
+                    <td><span class="badge badge-navy">CMMC 2.0 Assessment</span></td>
+                    <td>Jan 3, 2026</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="flex:1;height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                          <div style="width:65%;height:100%;background:var(--forge-teal);"></div>
+                        </div>
+                        <span style="font-size:12px;font-weight:600;">65%</span>
+                      </div>
+                    </td>
+                    <td>Michael Torres</td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="openModal('assessment')">Continue</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Texas Health Resources</strong></td>
+                    <td><span class="badge badge-teal">Security Posture Assessment</span></td>
+                    <td>Jan 5, 2026</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="flex:1;height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                          <div style="width:90%;height:100%;background:var(--forge-success);"></div>
+                        </div>
+                        <span style="font-size:12px;font-weight:600;">90%</span>
+                      </div>
+                    </td>
+                    <td>Sarah Mitchell</td>
+                    <td><button class="btn btn-ghost btn-sm">Continue</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lockheed Martin</strong></td>
+                    <td><span class="badge badge-info">Gap Analysis</span></td>
+                    <td>Jan 7, 2026</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="flex:1;height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                          <div style="width:25%;height:100%;background:var(--forge-warning);"></div>
+                        </div>
+                        <span style="font-size:12px;font-weight:600;">25%</span>
+                      </div>
+                    </td>
+                    <td>Emily Chen</td>
+                    <td><button class="btn btn-ghost btn-sm">Continue</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <div id="new-assessment-tab" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Start New Security Assessment</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Select Customer *</label>
+                  <select class="form-select">
+                    <option value="">Choose customer...</option>
+                    <option>Raytheon Intelligence</option>
+                    <option>Texas Health Resources</option>
+                    <option>Lockheed Martin</option>
+                    <option>First National Bank</option>
+                    <option>+ Add New Customer</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Assessment Type *</label>
+                  <select class="form-select">
+                    <option value="">Choose assessment type...</option>
+                    <option>Security Posture Assessment</option>
+                    <option>CMMC 2.0 Readiness Assessment</option>
+                    <option>HIPAA Gap Analysis</option>
+                    <option>NIST 800-53 Assessment</option>
+                    <option>Penetration Test</option>
+                    <option>Vulnerability Assessment</option>
+                    <option>RMF Assessment</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Assigned Consultant *</label>
+                  <select class="form-select">
+                    <option value="">Assign consultant...</option>
+                    <option>Michael Torres (CMMC Specialist)</option>
+                    <option>Sarah Mitchell (Healthcare Focus)</option>
+                    <option>James Wilson (Pen Test Lead)</option>
+                    <option>Emily Chen (RMF Expert)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Target Completion Date</label>
+                  <input type="date" class="form-input">
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;justify-content:flex-end;padding-top:24px;border-top:1px solid var(--forge-border);margin-top:24px;">
+                <button class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-primary" onclick="openModal('assessment')">Start Assessment</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           CONSULTING WORKFLOW SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="workflow" class="page-section">
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Forge Consulting Engagement Workflow</h3>
+              <span class="badge badge-teal">5-Phase Process</span>
+            </div>
+            <div class="card-body">
+              <div class="workflow-timeline">
+                <div class="workflow-step completed">
+                  <div class="workflow-header">
+                    <span class="workflow-title">Phase 1: Initial Discovery & Intake</span>
+                    <span class="workflow-duration">1-2 Days</span>
+                  </div>
+                  <p class="workflow-desc">Customer intake, stakeholder identification, scope definition, and preliminary documentation review. Establish communication channels and project timeline.</p>
+                  <div class="workflow-deliverables">
+                    <span class="deliverable-tag">Customer Intake Form</span>
+                    <span class="deliverable-tag">Engagement Letter</span>
+                    <span class="deliverable-tag">NDA</span>
+                    <span class="deliverable-tag">Kickoff Meeting</span>
+                  </div>
+                </div>
+                
+                <div class="workflow-step completed">
+                  <div class="workflow-header">
+                    <span class="workflow-title">Phase 2: Technical Discovery & Scanning</span>
+                    <span class="workflow-duration">3-5 Days</span>
+                  </div>
+                  <p class="workflow-desc">Deploy ForgeScan 360 for network discovery and vulnerability scanning. Conduct stakeholder interviews, review existing documentation, and map current security architecture.</p>
+                  <div class="workflow-deliverables">
+                    <span class="deliverable-tag">ForgeScan 360 Deployment</span>
+                    <span class="deliverable-tag">Asset Inventory</span>
+                    <span class="deliverable-tag">Interview Notes</span>
+                    <span class="deliverable-tag">Network Topology</span>
+                  </div>
+                </div>
+                
+                <div class="workflow-step active">
+                  <div class="workflow-header">
+                    <span class="workflow-title">Phase 3: Security Posture Assessment</span>
+                    <span class="workflow-duration">5-10 Days</span>
+                  </div>
+                  <p class="workflow-desc">Comprehensive evaluation across 7 security domains. Document maturity ratings, identify control gaps, and map findings to applicable compliance frameworks.</p>
+                  <div class="workflow-deliverables">
+                    <span class="deliverable-tag">Domain Maturity Ratings</span>
+                    <span class="deliverable-tag">Control Gap Analysis</span>
+                    <span class="deliverable-tag">Findings Register</span>
+                    <span class="deliverable-tag">Risk Scoring</span>
+                  </div>
+                </div>
+                
+                <div class="workflow-step">
+                  <div class="workflow-header">
+                    <span class="workflow-title">Phase 4: Report & Recommendations</span>
+                    <span class="workflow-duration">3-5 Days</span>
+                  </div>
+                  <p class="workflow-desc">Compile comprehensive assessment report with executive summary, detailed findings, prioritized remediation roadmap, and Forge service tier recommendations.</p>
+                  <div class="workflow-deliverables">
+                    <span class="deliverable-tag">Executive Summary</span>
+                    <span class="deliverable-tag">Technical Report</span>
+                    <span class="deliverable-tag">Remediation Roadmap</span>
+                    <span class="deliverable-tag">Service Proposal</span>
+                  </div>
+                </div>
+                
+                <div class="workflow-step">
+                  <div class="workflow-header">
+                    <span class="workflow-title">Phase 5: Presentation & Transition</span>
+                    <span class="workflow-duration">1-2 Days</span>
+                  </div>
+                  <p class="workflow-desc">Present findings to stakeholders, discuss recommendations, and transition to managed services engagement if approved. Begin ForgeComply 360 onboarding.</p>
+                  <div class="workflow-deliverables">
+                    <span class="deliverable-tag">Executive Presentation</span>
+                    <span class="deliverable-tag">Q&A Session</span>
+                    <span class="deliverable-tag">SOW for Services</span>
+                    <span class="deliverable-tag">Onboarding Plan</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="card" style="margin-bottom:24px;">
+              <div class="card-header">
+                <h3 class="card-title">Active Workflow Tracker</h3>
+              </div>
+              <div class="card-body">
+                <div style="margin-bottom:20px;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-weight:600;color:var(--forge-navy);">Raytheon Intelligence</span>
+                    <span style="font-size:13px;color:var(--forge-text-muted);">Phase 3</span>
+                  </div>
+                  <div style="height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                    <div style="width:60%;height:100%;background:linear-gradient(90deg,var(--forge-teal),var(--forge-teal-light));"></div>
+                  </div>
+                </div>
+                <div style="margin-bottom:20px;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-weight:600;color:var(--forge-navy);">Texas Health</span>
+                    <span style="font-size:13px;color:var(--forge-text-muted);">Phase 4</span>
+                  </div>
+                  <div style="height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                    <div style="width:80%;height:100%;background:linear-gradient(90deg,var(--forge-teal),var(--forge-teal-light));"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-weight:600;color:var(--forge-navy);">Lockheed Martin</span>
+                    <span style="font-size:13px;color:var(--forge-text-muted);">Phase 2</span>
+                  </div>
+                  <div style="height:8px;background:var(--forge-bg);border-radius:4px;overflow:hidden;">
+                    <div style="width:35%;height:100%;background:linear-gradient(90deg,var(--forge-warning),#fbbf24);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Quick Actions</h3>
+              </div>
+              <div class="card-body">
+                <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" onclick="openModal('assessment')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M9 11l3 3L22 4"/></svg>
+                  Start New Assessment
+                </button>
+                <button class="btn btn-secondary" style="width:100%;margin-bottom:12px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                  Generate Report
+                </button>
+                <button class="btn btn-secondary" style="width:100%;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           DOCUMENT TEMPLATES SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="templates" class="page-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div class="tabs" style="margin-bottom:0;">
+            <button class="tab active">All Templates</button>
+            <button class="tab">Assessment</button>
+            <button class="tab">Reports</button>
+            <button class="tab">Operational</button>
+            <button class="tab">Compliance</button>
+          </div>
+          <button class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Template
+          </button>
+        </div>
+        
+        <div class="template-grid">
+          <div class="template-card" onclick="openModal('assessment')">
+            <div class="template-icon assess">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Security Posture Assessment</h3>
+            <p class="template-desc">Comprehensive 7-domain security evaluation with maturity ratings, gap analysis, and prioritized recommendations. Industry-standard framework mapping included.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>24</strong> sections</span>
+              <span class="template-stat"><strong>7</strong> domains</span>
+              <span class="template-stat">Used <strong>47</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon report">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Executive Summary Report</h3>
+            <p class="template-desc">Board-ready security posture summary with risk dashboard, key findings, business impact analysis, and strategic recommendations for leadership.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>8</strong> sections</span>
+              <span class="template-stat"><strong>2-3</strong> pages</span>
+              <span class="template-stat">Used <strong>32</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon compliance">
+              <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">CMMC 2.0 Gap Analysis</h3>
+            <p class="template-desc">Complete CMMC Level 2 readiness assessment covering all 110 practices. Includes POA&M generator and remediation timeline calculator.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>110</strong> controls</span>
+              <span class="template-stat"><strong>14</strong> domains</span>
+              <span class="template-stat">Used <strong>28</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon ops">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Vulnerability Assessment Report</h3>
+            <p class="template-desc">Technical vulnerability findings with CVSS scores, exploitation likelihood, remediation guidance, and asset-by-asset breakdown.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>12</strong> sections</span>
+              <span class="template-stat">CVSS integration</span>
+              <span class="template-stat">Used <strong>56</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon incident">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Incident Response Plan</h3>
+            <p class="template-desc">Customizable IR playbook template with escalation procedures, communication templates, forensic checklists, and recovery procedures.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>6</strong> playbooks</span>
+              <span class="template-stat"><strong>18</strong> checklists</span>
+              <span class="template-stat">Used <strong>19</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon onboard">
+              <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="20" y1="8" x2="20" y2="14" stroke="currentColor" stroke-width="2"/><line x1="23" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Customer Onboarding Package</h3>
+            <p class="template-desc">Complete onboarding documentation including service agreements, data handling procedures, escalation contacts, and platform access setup.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>5</strong> documents</span>
+              <span class="template-stat">Checklist included</span>
+              <span class="template-stat">Used <strong>24</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon assess">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/><line x1="9" y1="21" x2="9" y2="9" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">HIPAA Gap Analysis</h3>
+            <p class="template-desc">Complete HIPAA Security Rule assessment covering Administrative, Physical, and Technical Safeguards with PHI handling evaluation.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>75</strong> controls</span>
+              <span class="template-stat"><strong>3</strong> safeguard areas</span>
+              <span class="template-stat">Used <strong>35</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon report">
+              <svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83" fill="none" stroke="currentColor" stroke-width="2"/><path d="M22 12A10 10 0 0012 2v10z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">Monthly Security Report</h3>
+            <p class="template-desc">Ongoing engagement monthly report template with metrics dashboard, incident summary, compliance status, and recommendations.</p>
+            <div class="template-meta">
+              <span class="template-stat"><strong>10</strong> sections</span>
+              <span class="template-stat">KPI tracking</span>
+              <span class="template-stat">Used <strong>89</strong> times</span>
+            </div>
+          </div>
+          
+          <div class="template-card">
+            <div class="template-icon ops">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><polyline points="12 6 12 12 16 14" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h3 class="template-name">POA&M Template</h3>
+            <p class="template-desc">Plan of Action & Milestones tracking template for compliance remediation. Auto-calculates timelines and resource requirements.</p>
+            <div class="template-meta">
+              <span class="template-stat">Timeline calculator</span>
+              <span class="template-stat">Resource tracking</span>
+              <span class="template-stat">Used <strong>67</strong> times</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           OPERATIONS SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="operations" class="page-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="stat-label">Active Engagements</div>
+            <div class="stat-value">8</div>
+            <div class="stat-change positive">All on track</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-label">Hours This Month</div>
+            <div class="stat-value">342</div>
+            <div class="stat-change">of 480 budgeted</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
+            </div>
+            <div class="stat-label">Completed This Month</div>
+            <div class="stat-value">12</div>
+            <div class="stat-change positive">↑ 20% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon navy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="stat-label">Revenue This Month</div>
+            <div class="stat-value">$127K</div>
+            <div class="stat-change positive">↑ 15% vs target</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Active Engagement Details</h3>
+            <div style="display:flex;gap:12px;">
+              <select class="form-select" style="width:auto;">
+                <option>All Consultants</option>
+                <option>Michael Torres</option>
+                <option>Sarah Mitchell</option>
+                <option>James Wilson</option>
+                <option>Emily Chen</option>
+              </select>
+              <button class="btn btn-secondary btn-sm">Export Report</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Engagement Type</th>
+                  <th>Consultant</th>
+                  <th>Start Date</th>
+                  <th>Hours Used</th>
+                  <th>Status</th>
+                  <th>Health</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Raytheon Intelligence</strong></td>
+                  <td>CMMC 2.0 Assessment</td>
+                  <td>Michael Torres</td>
+                  <td>Jan 3, 2026</td>
+                  <td>42 / 80 hrs</td>
+                  <td><span class="badge badge-warning">In Progress</span></td>
+                  <td><span class="badge badge-success">On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Texas Health Resources</strong></td>
+                  <td>HIPAA Gap Analysis + ForgeSOC Setup</td>
+                  <td>Sarah Mitchell</td>
+                  <td>Dec 15, 2025</td>
+                  <td>68 / 120 hrs</td>
+                  <td><span class="badge badge-warning">In Progress</span></td>
+                  <td><span class="badge badge-success">On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>First National Bank</strong></td>
+                  <td>Annual Penetration Test</td>
+                  <td>James Wilson</td>
+                  <td>Jan 6, 2026</td>
+                  <td>24 / 40 hrs</td>
+                  <td><span class="badge badge-info">Testing</span></td>
+                  <td><span class="badge badge-success">On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>DOD Contractor Alpha</strong></td>
+                  <td>RMF Assessment Package</td>
+                  <td>Emily Chen</td>
+                  <td>Dec 20, 2025</td>
+                  <td>56 / 60 hrs</td>
+                  <td><span class="badge badge-danger">Blocked</span></td>
+                  <td><span class="badge badge-danger">At Risk</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Lockheed Martin</strong></td>
+                  <td>NIST 800-171 Gap Analysis</td>
+                  <td>Emily Chen</td>
+                  <td>Jan 7, 2026</td>
+                  <td>16 / 60 hrs</td>
+                  <td><span class="badge badge-warning">In Progress</span></td>
+                  <td><span class="badge badge-success">On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Baylor Scott & White</strong></td>
+                  <td>Security Posture Assessment</td>
+                  <td>Sarah Mitchell</td>
+                  <td>Jan 8, 2026</td>
+                  <td>8 / 40 hrs</td>
+                  <td><span class="badge badge-info">Discovery</span></td>
+                  <td><span class="badge badge-success">On Track</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           REPORTS SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="reports" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Reports & Analytics</h3>
+          </div>
+          <div class="card-body" style="text-align:center;padding:60px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--forge-teal)" stroke-width="2" style="width:64px;height:64px;margin-bottom:16px;"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            <h3 style="font-family:'Montserrat';color:var(--forge-navy);margin-bottom:8px;">Analytics Dashboard Coming Soon</h3>
+            <p style="color:var(--forge-text-muted);">Advanced reporting and analytics capabilities are under development.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           TEAM MANAGEMENT SECTION
+      ═══════════════════════════════════════════════════════════════ -->
+      <section id="team" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Team Members</h3>
+            <button class="btn btn-primary btn-sm">Add Team Member</button>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Specialization</th>
+                  <th>Active Engagements</th>
+                  <th>Utilization</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:12px;"><div class="customer-avatar" style="width:36px;height:36px;font-size:14px;">MT</div><strong>Michael Torres</strong></div></td>
+                  <td>Senior Security Consultant</td>
+                  <td><span class="badge badge-navy">CMMC</span> <span class="badge badge-teal">ISSO</span></td>
+                  <td>3</td>
+                  <td>85%</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:12px;"><div class="customer-avatar" style="width:36px;height:36px;font-size:14px;">SM</div><strong>Sarah Mitchell</strong></div></td>
+                  <td>Healthcare Security Specialist</td>
+                  <td><span class="badge badge-navy">HIPAA</span> <span class="badge badge-teal">SOC</span></td>
+                  <td>2</td>
+                  <td>90%</td>
+                  <td><span class="badge badge-warning">Busy</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:12px;"><div class="customer-avatar" style="width:36px;height:36px;font-size:14px;">JW</div><strong>James Wilson</strong></div></td>
+                  <td>Penetration Test Lead</td>
+                  <td><span class="badge badge-danger">RedOps</span> <span class="badge badge-info">Pen Test</span></td>
+                  <td>2</td>
+                  <td>75%</td>
+                  <td><span class="badge badge-success">Available</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:12px;"><div class="customer-avatar" style="width:36px;height:36px;font-size:14px;">EC</div><strong>Emily Chen</strong></div></td>
+                  <td>RMF & Compliance Expert</td>
+                  <td><span class="badge badge-navy">RMF</span> <span class="badge badge-teal">FedRAMP</span></td>
+                  <td>2</td>
+                  <td>95%</td>
+                  <td><span class="badge badge-danger">Overloaded</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ASSESSMENT MODAL
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="assessmentModal">
+    <div class="modal" style="max-width:1100px;">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Security Posture Assessment</h2>
+          <p style="font-size:13px;color:var(--forge-text-muted);margin-top:4px;">Customer: Raytheon Intelligence | Consultant: Michael Torres</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('assessment')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs" style="margin-bottom:24px;">
+          <button class="tab active">Organization Info</button>
+          <button class="tab">Domain Ratings</button>
+          <button class="tab">Findings</button>
+          <button class="tab">Recommendations</button>
+          <button class="tab">Generate Report</button>
+        </div>
+        
+        <div style="margin-bottom:32px;">
+          <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Executive Summary</h4>
+          <div class="form-group">
+            <label class="form-label">Overall Security Posture Rating</label>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+              <button class="rating-btn critical">1 - Critical</button>
+              <button class="rating-btn low">2 - Low</button>
+              <button class="rating-btn selected partial">3 - Partial</button>
+              <button class="rating-btn adequate">4 - Adequate</button>
+              <button class="rating-btn mature">5 - Mature</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Executive Summary</label>
+            <textarea class="form-textarea" style="min-height:100px;" placeholder="Provide a high-level summary of the organization's security posture...">The organization demonstrates a developing security program with established foundations in access control and network security. However, significant gaps exist in incident response capabilities and security awareness training. The current maturity level is assessed as PARTIAL (Level 3), with clear opportunities for improvement across multiple domains.</textarea>
+          </div>
+        </div>
+        
+        <div style="margin-bottom:32px;">
+          <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Security Domain Maturity Ratings</h4>
+          <div class="domain-rating-grid">
+            <div class="domain-rating-card">
+              <div class="domain-name">1. Governance & Risk Management</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn">2</button>
+                <button class="rating-btn selected partial">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">2. Access Control & Identity</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn">2</button>
+                <button class="rating-btn">3</button>
+                <button class="rating-btn selected adequate">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">3. Detection & Monitoring</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn selected low">2</button>
+                <button class="rating-btn">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">4. Incident Response</div>
+              <div class="rating-scale">
+                <button class="rating-btn selected critical">1</button>
+                <button class="rating-btn">2</button>
+                <button class="rating-btn">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">5. Compliance & Audit</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn">2</button>
+                <button class="rating-btn selected partial">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">6. Security Awareness</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn selected low">2</button>
+                <button class="rating-btn">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+            <div class="domain-rating-card">
+              <div class="domain-name">7. Data Protection</div>
+              <div class="rating-scale">
+                <button class="rating-btn">1</button>
+                <button class="rating-btn">2</button>
+                <button class="rating-btn selected partial">3</button>
+                <button class="rating-btn">4</button>
+                <button class="rating-btn">5</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 style="font-family:'Montserrat';font-weight:600;color:var(--forge-navy);margin-bottom:16px;">Key Findings</h4>
+          <div class="findings-list">
+            <div class="finding-item">
+              <span class="finding-severity critical">Critical</span>
+              <div class="finding-content">
+                <div class="finding-title">No Documented Incident Response Plan</div>
+                <div class="finding-desc">Organization lacks a formal incident response plan. No defined escalation procedures or communication protocols exist. → NIST IR-1, IR-4, IR-5</div>
+              </div>
+            </div>
+            <div class="finding-item">
+              <span class="finding-severity high">High</span>
+              <div class="finding-content">
+                <div class="finding-title">Insufficient Security Monitoring Coverage</div>
+                <div class="finding-desc">SIEM coverage is limited to 40% of critical assets. Log retention is only 30 days. → NIST SI-4, AU-6</div>
+              </div>
+            </div>
+            <div class="finding-item">
+              <span class="finding-severity medium">Medium</span>
+              <div class="finding-content">
+                <div class="finding-title">Security Awareness Training Gaps</div>
+                <div class="finding-desc">Annual security training completion rate is 62%. No phishing simulation program in place. → NIST AT-2, AT-3</div>
+              </div>
+            </div>
+            <div class="finding-item">
+              <span class="finding-severity low">Low</span>
+              <div class="finding-content">
+                <div class="finding-title">Password Policy Below Best Practices</div>
+                <div class="finding-desc">Current policy requires 8 characters minimum. Industry standard recommends 12+ with MFA. → NIST IA-5</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="margin-top:16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Finding
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('assessment')">Save & Close</button>
+        <button class="btn btn-navy">Save Progress</button>
+        <button class="btn btn-primary">Generate Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       NEW CUSTOMER MODAL
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="newCustomerModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Customer</h2>
+        <button class="modal-close" onclick="closeModal('newCustomer')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Organization Name *</label>
+            <input type="text" class="form-input" placeholder="Enter organization name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Industry Sector *</label>
+            <select class="form-select">
+              <option value="">Select sector...</option>
+              <option>Defense / DOD Contractor</option>
+              <option>Federal Government</option>
+              <option>Healthcare</option>
+              <option>Financial Services</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Primary Contact Name *</label>
+            <input type="text" class="form-input" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" placeholder="email@company.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" placeholder="(xxx) xxx-xxxx">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Initial Pipeline Stage</label>
+            <select class="form-select">
+              <option>Lead</option>
+              <option>Assessment</option>
+              <option>Proposal</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" placeholder="Any initial notes about this customer..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('newCustomer')">Cancel</button>
+        <button class="btn btn-primary">Create Customer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Navigation
+    function showSection(sectionId) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      event.target.closest('.nav-item').classList.add('active');
+      
+      const titles = {
+        'dashboard': { title: 'Service Delivery Dashboard', breadcrumb: 'Home / Dashboard' },
+        'crm': { title: 'Customer Relationship Management', breadcrumb: 'Home / CRM' },
+        'intake': { title: 'New Customer Intake', breadcrumb: 'Home / Intake' },
+        'assessments': { title: 'Security Assessments', breadcrumb: 'Home / Assessments' },
+        'workflow': { title: 'Consulting Workflow', breadcrumb: 'Home / Workflow' },
+        'templates': { title: 'Document Templates', breadcrumb: 'Home / Templates' },
+        'operations': { title: 'Active Engagements', breadcrumb: 'Home / Operations' },
+        'reports': { title: 'Reports & Analytics', breadcrumb: 'Home / Reports' },
+        'team': { title: 'Team Management', breadcrumb: 'Admin / Team' }
+      };
+      
+      if (titles[sectionId]) {
+        document.getElementById('pageTitle').textContent = titles[sectionId].title;
+        document.getElementById('pageBreadcrumb').textContent = titles[sectionId].breadcrumb;
+      }
+    }
+    
+    // Modal controls
+    function openModal(modalName) {
+      document.getElementById(modalName + 'Modal').classList.add('active');
+    }
+    
+    function closeModal(modalName) {
+      document.getElementById(modalName + 'Modal').classList.remove('active');
+    }
+    
+    // CRM view switching
+    function switchCrmView(view) {
+      document.querySelectorAll('#crm .tabs .tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('#crm .tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(view + '-view').classList.add('active');
+    }
+    
+    // Assessment tab switching
+    function switchAssessmentTab(tab) {
+      document.querySelectorAll('#assessments .tabs .tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('#assessments .tab-content').forEach(c => c.classList.remove('active'));
+      if (tab === 'active') {
+        document.getElementById('active-assessments').classList.add('active');
+      } else if (tab === 'newAssessment') {
+        document.getElementById('new-assessment-tab').classList.add('active');
+      }
+    }
+    
+    // Rating button selection
+    document.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const scale = this.closest('.rating-scale');
+        if (scale) {
+          scale.querySelectorAll('.rating-btn').forEach(b => {
+            b.classList.remove('selected', 'critical', 'low', 'partial', 'adequate', 'mature');
+          });
+          const level = Array.from(scale.children).indexOf(this) + 1;
+          const classes = ['critical', 'low', 'partial', 'adequate', 'mature'];
+          this.classList.add('selected', classes[level - 1]);
+        }
+      });
+    });
+    
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('active');
+      });
+    });
+  </script>
+</body>
+</html>
