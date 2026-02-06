@@ -5,18 +5,15 @@ interface CardProps {
   action?: ReactNode
   children: ReactNode
   className?: string
-  glow?: boolean
   noPadding?: boolean
 }
 
-export default function Card({ title, action, children, className = '', glow, noPadding }: CardProps) {
+export default function Card({ title, action, children, className = '', noPadding }: CardProps) {
   return (
-    <div
-      className={`bg-forge-card rounded-2xl border border-forge-border overflow-hidden transition-all duration-200 ${glow ? 'card-glow' : ''} ${className}`}
-    >
+    <div className={`bg-white rounded-2xl border border-forge-border overflow-hidden ${className}`}>
       {title && (
         <div className="flex items-center justify-between px-6 py-4 border-b border-forge-border">
-          <h3 className="font-heading text-base font-bold text-forge-text">
+          <h3 className="font-heading text-base font-bold text-forge-navy">
             {title}
           </h3>
           {action && <div>{action}</div>}

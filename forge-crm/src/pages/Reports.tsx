@@ -11,21 +11,21 @@ const metrics = [
 export default function Reports() {
   return (
     <div>
-      <div className="grid grid-cols-4 gap-6 mb-8 stagger-children">
+      <div className="grid grid-cols-4 gap-6 mb-8">
         {metrics.map((metric) => (
-          <div key={metric.label} className="bg-forge-card rounded-2xl border border-forge-border p-6 card-glow animate-slideUp">
+          <div key={metric.label} className="bg-white rounded-2xl border border-forge-border p-6">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${metric.color}`}>
               <metric.icon size={24} />
             </div>
             <div className="text-[13px] text-forge-text-muted font-medium mb-2">{metric.label}</div>
-            <div className="font-heading text-[32px] font-bold text-forge-text">{metric.value}</div>
+            <div className="font-heading text-[32px] font-bold text-forge-navy">{metric.value}</div>
             <div className="text-[13px] text-forge-success flex items-center gap-1 mt-2">{metric.change}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <Card title="Revenue by Service Type" glow>
+        <Card title="Revenue by Service Type">
           <div className="space-y-4">
             {[
               { name: 'Security Assessments', value: '$485K', pct: 38 },
@@ -36,10 +36,10 @@ export default function Reports() {
             ].map((item) => (
               <div key={item.name}>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="font-medium text-forge-text">{item.name}</span>
+                  <span className="font-medium text-forge-navy">{item.name}</span>
                   <span className="text-forge-text-muted">{item.value} ({item.pct}%)</span>
                 </div>
-                <div className="h-2 bg-forge-bg-subtle rounded-full overflow-hidden">
+                <div className="h-2 bg-forge-bg rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-forge-teal to-forge-teal-light rounded-full" style={{ width: `${item.pct * 2.5}%` }} />
                 </div>
               </div>
@@ -47,7 +47,7 @@ export default function Reports() {
           </div>
         </Card>
 
-        <Card title="Assessment Pipeline" glow>
+        <Card title="Assessment Pipeline">
           <div className="space-y-4">
             {[
               { name: 'Completed', count: 142, color: 'bg-forge-success' },
@@ -58,8 +58,8 @@ export default function Reports() {
             ].map((item) => (
               <div key={item.name} className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${item.color}`} />
-                <span className="flex-1 text-sm font-medium text-forge-text">{item.name}</span>
-                <span className="text-sm font-heading font-bold text-forge-text">{item.count}</span>
+                <span className="flex-1 text-sm font-medium text-forge-navy">{item.name}</span>
+                <span className="text-sm font-heading font-bold text-forge-navy">{item.count}</span>
               </div>
             ))}
           </div>

@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, UserPlus, ClipboardCheck, GitBranch,
   FileText, Briefcase, BarChart3, UsersRound, Settings, Shield,
-  ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
@@ -32,63 +31,45 @@ const navGroups: NavGroup[] = [
   ]},
 ]
 
-interface SidebarProps {
-  collapsed: boolean
-  onToggle: () => void
-}
-
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export default function Sidebar() {
   return (
-    <aside className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[280px]'}`}
-      style={{ background: 'linear-gradient(180deg, #061525 0%, #0F2A4A 50%, #132f52 100%)' }}>
-
+    <aside className="fixed left-0 top-0 bottom-0 z-50 w-[280px] flex flex-col bg-forge-navy-deep overflow-y-auto">
       {/* Logo */}
-      <div className="relative px-4 py-5 border-b border-white/8">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-forge-teal to-forge-cyan flex items-center justify-center shadow-lg shadow-forge-teal/30 flex-shrink-0">
-            <Shield size={20} className="text-white" />
-          </div>
-          {!collapsed && (
-            <div className="animate-fadeIn overflow-hidden">
-              <h1 className="font-heading text-[13px] font-bold text-white tracking-wider leading-tight whitespace-nowrap">FORGE CYBER DEFENSE</h1>
-              <p className="text-[10px] text-white/40 mt-0.5 font-medium">Service Delivery Portal</p>
-            </div>
-          )}
+      <div className="flex flex-col items-center py-6 px-4">
+        <div className="w-[90px] h-[90px] rounded-2xl bg-gradient-to-br from-forge-teal to-forge-cyan flex items-center justify-center mb-3">
+          <Shield size={44} className="text-white" />
         </div>
-        <button onClick={onToggle} className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-forge-navy border-2 border-forge-border flex items-center justify-center text-white/60 hover:text-white hover:bg-forge-teal transition-all shadow-md z-10">
-          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-        </button>
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-forge-teal text-center">
+          Service Delivery Portal
+        </p>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
+      <nav className="flex-1 px-4 py-2 space-y-5">
         {navGroups.map((group) => (
           <div key={group.heading}>
-            {!collapsed && (
-              <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30">{group.heading}</p>
-            )}
-            <ul className="space-y-0.5">
+            <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30">
+              {group.heading}
+            </p>
+            <ul className="space-y-1">
               {group.items.map((item) => (
                 <li key={item.to}>
-                  <NavLink to={item.to} title={collapsed ? item.label : undefined}
+                  <NavLink
+                    to={item.to}
                     className={({ isActive }) =>
-                      `group flex items-center gap-3 rounded-xl cursor-pointer transition-all duration-200 relative ${collapsed ? 'px-0 py-2.5 justify-center' : 'px-3 py-2.5'} ${
+                      `flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-gradient-to-r from-forge-teal/20 to-forge-teal/5 text-white shadow-[inset_0_0_0_1px_rgba(13,148,136,0.3)]'
-                          : 'text-white/50 hover:bg-white/5 hover:text-white/80'
+                          ? 'bg-forge-teal text-white'
+                          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
                       }`
-                    }>
-                    {({ isActive }) => (
-                      <>
-                        {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-forge-teal" />}
-                        <span className={`flex-shrink-0 transition-colors ${isActive ? 'text-forge-teal' : ''}`}>{item.icon}</span>
-                        {!collapsed && <span className="text-[13px] font-medium flex-1 whitespace-nowrap">{item.label}</span>}
-                        {!collapsed && item.badge && (
-                          <span className={`min-w-[20px] h-5 flex items-center justify-center rounded-md text-[10px] font-bold ${isActive ? 'bg-forge-teal/30 text-forge-teal-light' : 'bg-white/10 text-white/50'}`}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </>
+                    }
+                  >
+                    <span className="flex-shrink-0">{item.icon}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span className="min-w-[22px] h-[22px] flex items-center justify-center rounded-full bg-forge-danger text-white text-[10px] font-bold">
+                        {item.badge}
+                      </span>
                     )}
                   </NavLink>
                 </li>
@@ -97,21 +78,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
         ))}
       </nav>
-
-      {/* User Profile */}
-      <div className="px-3 py-3 border-t border-white/8">
-        <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors ${collapsed ? 'justify-center px-0' : ''}`}>
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-forge-teal to-forge-cyan flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
-            SC
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0 animate-fadeIn">
-              <p className="text-[13px] font-semibold text-white truncate">Stan Chen</p>
-              <p className="text-[10px] text-white/40 truncate">Senior Consultant</p>
-            </div>
-          )}
-        </div>
-      </div>
     </aside>
   )
 }

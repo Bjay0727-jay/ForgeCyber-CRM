@@ -27,7 +27,7 @@ export default function Workflow() {
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: '2fr 1fr' }}>
       {/* Left Column: Workflow Timeline */}
-      <Card title="Forge Consulting Engagement Workflow" glow>
+      <Card title="Forge Consulting Engagement Workflow">
         <div className="relative pl-10">
           {/* Vertical Line */}
           <div
@@ -37,11 +37,11 @@ export default function Workflow() {
             }}
           />
 
-          <div className="space-y-8 stagger-children">
+          <div className="space-y-8">
             {workflowPhases.map((phase, idx) => {
               const config = statusConfig[phase.status]
               return (
-                <div key={idx} className="relative animate-slideUp">
+                <div key={idx} className="relative">
                   {/* Status Dot */}
                   <div
                     className={`absolute -left-10 top-1 w-8 h-8 rounded-full flex items-center justify-center ${config.dotClass}`}
@@ -51,12 +51,12 @@ export default function Workflow() {
                   </div>
 
                   {/* Phase Card */}
-                  <div className="p-5 rounded-xl border border-forge-border hover:border-forge-teal/30 transition-colors bg-forge-card">
+                  <div className="p-5 rounded-xl border border-forge-border hover:border-forge-teal/30 transition-colors bg-white">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-heading text-sm font-bold text-forge-text">
+                      <h4 className="font-heading text-sm font-bold text-forge-navy">
                         {phase.title}
                       </h4>
-                      <span className="text-xs text-forge-text-muted bg-forge-bg-subtle px-3 py-1 rounded-full">
+                      <span className="text-xs text-forge-text-muted bg-forge-bg px-3 py-1 rounded-full">
                         {phase.duration}
                       </span>
                     </div>
@@ -84,19 +84,19 @@ export default function Workflow() {
       {/* Right Column */}
       <div className="space-y-6">
         {/* Active Workflow Tracker */}
-        <Card title="Active Workflow Tracker" glow>
+        <Card title="Active Workflow Tracker">
           <div className="space-y-5">
             {workflowTrackers.map((tracker) => (
               <div key={tracker.name}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold text-forge-text">
+                  <p className="text-sm font-semibold text-forge-navy">
                     {tracker.name}
                   </p>
                   <span className="text-xs text-forge-text-muted">
                     {tracker.phase}
                   </span>
                 </div>
-                <div className="h-2 bg-forge-bg-subtle rounded-full overflow-hidden">
+                <div className="h-2 bg-forge-bg rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${getTrackerColor(tracker.progress)}`}
                     style={{ width: `${tracker.progress}%` }}
@@ -111,23 +111,23 @@ export default function Workflow() {
         </Card>
 
         {/* Workflow Overview */}
-        <Card title="Workflow Overview" glow>
+        <Card title="Workflow Overview">
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b border-forge-border">
               <span className="text-sm text-forge-text-muted">Total Duration</span>
-              <span className="font-heading text-sm font-bold text-forge-text">13-24 Days</span>
+              <span className="font-heading text-sm font-bold text-forge-navy">13-24 Days</span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-forge-border">
               <span className="text-sm text-forge-text-muted">Key Deliverables</span>
-              <span className="font-heading text-sm font-bold text-forge-text">20+ Documents</span>
+              <span className="font-heading text-sm font-bold text-forge-navy">20+ Documents</span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-forge-border">
               <span className="text-sm text-forge-text-muted">Active Phases</span>
-              <span className="font-heading text-sm font-bold text-forge-text">5 Phases</span>
+              <span className="font-heading text-sm font-bold text-forge-navy">5 Phases</span>
             </div>
             <div className="flex items-center justify-between py-3">
               <span className="text-sm text-forge-text-muted">Security Domains</span>
-              <span className="font-heading text-sm font-bold text-forge-text">7 Domains</span>
+              <span className="font-heading text-sm font-bold text-forge-navy">7 Domains</span>
             </div>
           </div>
         </Card>

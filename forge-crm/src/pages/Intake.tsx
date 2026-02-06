@@ -76,7 +76,7 @@ type IntakeFormData = z.infer<typeof intakeSchema>
 const getInputClasses = (hasError: boolean): string =>
   [
     'w-full py-3 px-4 border rounded-xl text-sm',
-    'font-[family-name:var(--font-body)] text-forge-text bg-forge-card',
+    'font-[family-name:var(--font-body)] text-forge-navy bg-white',
     'transition-all focus:outline-none',
     hasError
       ? 'border-forge-danger focus:border-forge-danger focus:ring-forge-danger/20'
@@ -130,7 +130,7 @@ export default function Intake() {
   }
 
   return (
-    <Card glow>
+    <Card>
       {showSuccess && (
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-forge-success/30 bg-forge-success/10 px-5 py-4 animate-fadeInScale">
           <CheckCircle className="text-forge-success" size={20} />
@@ -143,13 +143,13 @@ export default function Intake() {
       <form className="space-y-10" onSubmit={handleSubmit(onSubmit)}>
         {/* Organization Information */}
         <section>
-          <h3 className="font-heading text-lg font-semibold text-forge-text mb-5">
+          <h3 className="font-heading text-lg font-semibold text-forge-navy mb-5">
             Organization Information
           </h3>
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">
+                <label className="block text-sm font-medium text-forge-navy mb-2">
                   Organization Name *
                 </label>
                 <input
@@ -163,7 +163,7 @@ export default function Intake() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">
+                <label className="block text-sm font-medium text-forge-navy mb-2">
                   Industry Sector *
                 </label>
                 <select
@@ -181,16 +181,16 @@ export default function Intake() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-2">Address</label>
+              <label className="block text-sm font-medium text-forge-navy mb-2">Address</label>
               <input type="text" className={getInputClasses(false)} placeholder="Street address" {...register('organization.address')} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-2">City, State, ZIP</label>
+              <label className="block text-sm font-medium text-forge-navy mb-2">City, State, ZIP</label>
               <input type="text" className={getInputClasses(false)} placeholder="City, State ZIP" {...register('organization.cityStateZip')} />
             </div>
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Website</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Website</label>
                 <input
                   type="url"
                   className={getInputClasses(!!errors.organization?.website)}
@@ -202,7 +202,7 @@ export default function Intake() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Employee Count</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Employee Count</label>
                 <select className={getInputClasses(false)} {...register('organization.employeeCount')}>
                   <option value="">Select range...</option>
                   <option value="1-50">1 - 50</option>
@@ -218,13 +218,13 @@ export default function Intake() {
 
         {/* Primary Contact */}
         <section>
-          <h3 className="font-heading text-lg font-semibold text-forge-text mb-5">
+          <h3 className="font-heading text-lg font-semibold text-forge-navy mb-5">
             Primary Contact
           </h3>
           <div className="space-y-5">
             <div className="grid grid-cols-3 gap-5">
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Full Name *</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Full Name *</label>
                 <input
                   type="text"
                   className={getInputClasses(!!errors.contact?.name)}
@@ -236,11 +236,11 @@ export default function Intake() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Title</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Title</label>
                 <input type="text" className={getInputClasses(false)} placeholder="Job title" {...register('contact.title')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Email *</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Email *</label>
                 <input
                   type="email"
                   className={getInputClasses(!!errors.contact?.email)}
@@ -254,11 +254,11 @@ export default function Intake() {
             </div>
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Phone</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Phone</label>
                 <input type="tel" className={getInputClasses(false)} placeholder="(555) 000-0000" {...register('contact.phone')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Preferred Contact Method</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Preferred Contact Method</label>
                 <select className={getInputClasses(false)} {...register('contact.preferredContact')}>
                   <option value="Email">Email</option>
                   <option value="Phone">Phone</option>
@@ -272,12 +272,12 @@ export default function Intake() {
 
         {/* Compliance & Security Requirements */}
         <section>
-          <h3 className="font-heading text-lg font-semibold text-forge-text mb-5">
+          <h3 className="font-heading text-lg font-semibold text-forge-navy mb-5">
             Compliance & Security Requirements
           </h3>
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-3">Applicable Frameworks</label>
+              <label className="block text-sm font-medium text-forge-navy mb-3">Applicable Frameworks</label>
               <Controller
                 name="compliance"
                 control={control}
@@ -306,7 +306,7 @@ export default function Intake() {
                             }}
                             className="w-4 h-4 rounded border-forge-border text-forge-teal focus:ring-forge-teal"
                           />
-                          <span className="text-sm text-forge-text">{fw}</span>
+                          <span className="text-sm text-forge-navy">{fw}</span>
                         </label>
                       )
                     })}
@@ -315,11 +315,11 @@ export default function Intake() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-2">Current Security Tools & Technologies</label>
+              <label className="block text-sm font-medium text-forge-navy mb-2">Current Security Tools & Technologies</label>
               <textarea rows={3} className={getInputClasses(false)} placeholder="List current security tools, SIEM, EDR, firewalls, etc." {...register('securityTools')} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-2">Known Security Challenges</label>
+              <label className="block text-sm font-medium text-forge-navy mb-2">Known Security Challenges</label>
               <textarea rows={3} className={getInputClasses(false)} placeholder="Describe any known security gaps, recent incidents, or concerns..." {...register('securityChallenges')} />
             </div>
           </div>
@@ -327,12 +327,12 @@ export default function Intake() {
 
         {/* Engagement Details */}
         <section>
-          <h3 className="font-heading text-lg font-semibold text-forge-text mb-5">
+          <h3 className="font-heading text-lg font-semibold text-forge-navy mb-5">
             Engagement Details
           </h3>
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-3">Requested Services</label>
+              <label className="block text-sm font-medium text-forge-navy mb-3">Requested Services</label>
               <Controller
                 name="services"
                 control={control}
@@ -361,7 +361,7 @@ export default function Intake() {
                             }}
                             className="w-4 h-4 rounded border-forge-border text-forge-teal focus:ring-forge-teal"
                           />
-                          <span className="text-sm text-forge-text">{svc}</span>
+                          <span className="text-sm text-forge-navy">{svc}</span>
                         </label>
                       )
                     })}
@@ -371,7 +371,7 @@ export default function Intake() {
             </div>
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Desired Timeline</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Desired Timeline</label>
                 <select className={getInputClasses(false)} {...register('timeline')}>
                   <option value="">Select timeline...</option>
                   <option value="immediate">Immediate (within 2 weeks)</option>
@@ -381,7 +381,7 @@ export default function Intake() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-forge-text mb-2">Budget Range</label>
+                <label className="block text-sm font-medium text-forge-navy mb-2">Budget Range</label>
                 <select className={getInputClasses(false)} {...register('budget')}>
                   <option value="">Select range...</option>
                   <option value="25k-50k">$25,000 - $50,000</option>
@@ -392,7 +392,7 @@ export default function Intake() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-forge-text mb-2">Additional Notes</label>
+              <label className="block text-sm font-medium text-forge-navy mb-2">Additional Notes</label>
               <textarea rows={4} className={getInputClasses(false)} placeholder="Any additional context, special requirements, or notes..." {...register('notes')} />
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function Intake() {
             type="button"
             disabled={isDraftSaving}
             onClick={handleSaveDraft}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-forge-border text-sm font-semibold text-forge-text-muted hover:bg-forge-bg-subtle transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-forge-border text-sm font-semibold text-forge-text-muted hover:bg-forge-bg transition-colors disabled:opacity-50"
           >
             {isDraftSaving ? (
               <><Loader2 size={18} className="animate-spin" /> Saving...</>

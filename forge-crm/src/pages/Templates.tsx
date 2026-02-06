@@ -39,13 +39,13 @@ const iconConfig: Record<string, { icon: React.ReactNode; gradient: string }> = 
 
 export default function Templates() {
   return (
-    <div className="grid grid-cols-3 gap-6 stagger-children">
+    <div className="grid grid-cols-3 gap-6">
       {templates.map((template) => {
         const config = iconConfig[template.iconType]
         return (
           <div
             key={template.name}
-            className="group bg-forge-card rounded-2xl border border-forge-border overflow-hidden card-glow cursor-pointer animate-slideUp"
+            className="group bg-white rounded-2xl border border-forge-border overflow-hidden cursor-pointer"
           >
             {/* Accent Bar */}
             <div
@@ -60,7 +60,7 @@ export default function Templates() {
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${config.gradient}`}>
                 {config.icon}
               </div>
-              <h3 className="font-heading font-bold text-base text-forge-text mb-2">
+              <h3 className="font-heading font-bold text-base text-forge-navy mb-2">
                 {template.name}
               </h3>
               <p className="text-[13px] text-forge-text-muted leading-relaxed mb-5">

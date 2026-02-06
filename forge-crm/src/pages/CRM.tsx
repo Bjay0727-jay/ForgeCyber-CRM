@@ -82,7 +82,7 @@ function SortableCard({ card, isDragOverlay }: SortableCardProps) {
       ref={setNodeRef}
       style={style}
       className={`
-        bg-forge-card rounded-xl border border-forge-border p-3.5
+        bg-white rounded-xl border border-forge-border p-3.5
         transition-all duration-200 cursor-grab
         ${isDragging ? 'opacity-50 ring-2 ring-forge-teal shadow-lg' : 'hover:shadow-md hover:border-forge-teal/40'}
         ${isDragOverlay ? 'shadow-xl ring-2 ring-forge-teal rotate-[2deg]' : ''}
@@ -95,7 +95,7 @@ function SortableCard({ card, isDragOverlay }: SortableCardProps) {
           <GripVertical size={14} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-forge-text mb-1">
+          <p className="font-semibold text-sm text-forge-navy mb-1">
             {card.name}
           </p>
           <p className="text-xs text-forge-text-muted mb-3">
@@ -122,13 +122,13 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
   return (
     <div className="min-w-[260px] space-y-3">
       <div
-        className={`bg-forge-card rounded-xl border border-forge-border border-t-4 ${columnBorderColor[column.title] ?? 'border-t-forge-info'} p-4`}
+        className={`bg-white rounded-xl border border-forge-border border-t-4 ${columnBorderColor[column.title] ?? 'border-t-forge-info'} p-4`}
       >
         <div className="flex items-center justify-between">
-          <h3 className="font-heading text-sm font-bold text-forge-text">
+          <h3 className="font-heading text-sm font-bold text-forge-navy">
             {column.title}
           </h3>
-          <span className="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-forge-bg-subtle text-xs font-bold text-forge-text-muted">
+          <span className="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-forge-bg text-xs font-bold text-forge-text-muted">
             {column.cards.length}
           </span>
         </div>
@@ -137,7 +137,7 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
       <div
         ref={setNodeRef}
         className={`
-          bg-forge-bg-subtle rounded-xl p-2 min-h-[80px] space-y-2 transition-colors duration-200
+          bg-forge-bg rounded-xl p-2 min-h-[80px] space-y-2 transition-colors duration-200
           ${isOverColumn ? 'bg-forge-teal/5 ring-1 ring-forge-teal/20' : ''}
         `}
       >
@@ -270,15 +270,15 @@ export default function CRM() {
   return (
     <div className="space-y-6">
       {/* Tab Bar */}
-      <div className="flex gap-1 bg-forge-bg-subtle p-1 rounded-xl w-fit border border-forge-border">
+      <div className="flex gap-1 bg-forge-bg p-1 rounded-xl w-fit border border-forge-border">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
               activeTab === tab.key
-                ? 'bg-forge-card shadow-sm text-forge-teal border border-forge-border'
-                : 'text-forge-text-muted hover:text-forge-text border border-transparent'
+                ? 'bg-white shadow-sm text-forge-teal border border-forge-border'
+                : 'text-forge-text-muted hover:text-forge-navy border border-transparent'
             }`}
           >
             {tab.label}
@@ -319,7 +319,6 @@ export default function CRM() {
       {activeTab === 'customers' && (
         <Card
           title="All Customers"
-          glow
           action={
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -330,7 +329,7 @@ export default function CRM() {
                 <select
                   value={sectorFilter}
                   onChange={(e) => setSectorFilter(e.target.value)}
-                  className="pl-9 pr-4 py-2 rounded-lg border border-forge-border text-sm text-forge-text bg-forge-card focus:outline-none focus:border-forge-teal appearance-none cursor-pointer"
+                  className="pl-9 pr-4 py-2 rounded-lg border border-forge-border text-sm text-forge-navy bg-white focus:outline-none focus:border-forge-teal appearance-none cursor-pointer"
                 >
                   <option value="all">All Sectors</option>
                   <option value="defense">Defense</option>
@@ -349,13 +348,13 @@ export default function CRM() {
             {filteredCustomers.map((customer) => (
               <div
                 key={customer.name}
-                className="flex items-center gap-4 p-4 rounded-xl border border-forge-border hover:bg-forge-bg-subtle hover:border-forge-teal/30 transition-all cursor-pointer"
+                className="flex items-center gap-4 p-4 rounded-xl border border-forge-border hover:bg-forge-bg hover:border-forge-teal/30 transition-all cursor-pointer"
               >
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-forge-navy to-forge-navy-light flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                   {customer.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-forge-text text-sm">
+                  <p className="font-semibold text-forge-navy text-sm">
                     {customer.name}
                   </p>
                   <p className="text-xs text-forge-text-muted mt-0.5 truncate">
@@ -376,12 +375,12 @@ export default function CRM() {
 
       {/* Opportunities */}
       {activeTab === 'opportunities' && (
-        <Card glow>
+        <Card>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-forge-teal-glow flex items-center justify-center mb-4 animate-float">
               <Filter size={28} className="text-forge-teal" />
             </div>
-            <h3 className="font-heading text-lg font-bold text-forge-text mb-2">
+            <h3 className="font-heading text-lg font-bold text-forge-navy mb-2">
               Opportunities View Coming Soon
             </h3>
             <p className="text-sm text-forge-text-muted max-w-md">

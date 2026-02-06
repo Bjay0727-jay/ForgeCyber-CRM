@@ -18,21 +18,21 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Moda
       onClick={onClose}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-forge-navy/60 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-forge-navy/60 backdrop-blur-sm" />
 
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-[900px] max-h-[90vh] mx-4 bg-forge-card rounded-2xl shadow-2xl border border-forge-border flex flex-col animate-fadeInScale"
+        className="relative w-full max-w-[900px] max-h-[90vh] mx-4 bg-white rounded-2xl shadow-2xl border border-forge-border flex flex-col animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-forge-border flex-shrink-0">
-          <h2 className="font-heading text-xl font-bold text-forge-text">
+          <h2 className="font-heading text-xl font-bold text-forge-navy">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-forge-text-muted hover:bg-forge-bg-subtle hover:text-forge-text transition-colors"
+            className="p-2 rounded-xl text-forge-text-muted hover:bg-forge-bg hover:text-forge-navy transition-colors"
           >
             <X size={20} />
           </button>
