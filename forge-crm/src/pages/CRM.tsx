@@ -1,14 +1,204 @@
 import { useState } from 'react';
-import { Plus, Filter } from 'lucide-react';
-import { pipelineColumns, customers } from '../data/mockData';
+import { Plus, Filter, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDroppable,
+} from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { pipelineColumns as initialPipelineColumns, customers } from '../data/mockData';
 import Badge from '../components/Badge';
 import Card from '../components/Card';
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface PipelineCard {
+  id: string;
+  name: string;
+  meta: string;
+  value: string;
+}
+
+interface PipelineColumn {
+  id: string;
+  title: string;
+  colorClass: string;
+  cards: PipelineCard[];
+}
+
 type Tab = 'pipeline' | 'customers' | 'opportunities';
+
+// ---------------------------------------------------------------------------
+// Column color mapping for top border
+// ---------------------------------------------------------------------------
+
+const columnBorderColor: Record<string, string> = {
+  Lead: 'border-t-forge-info',
+  Assessment: 'border-t-forge-warning',
+  Proposal: 'border-t-forge-teal',
+  Negotiation: 'border-t-forge-purple',
+  'Closed Won': 'border-t-forge-success',
+};
+
+// ---------------------------------------------------------------------------
+// Helper: build initial state from mock data, assigning unique ids
+// ---------------------------------------------------------------------------
+
+function buildInitialColumns(): PipelineColumn[] {
+  return initialPipelineColumns.map((col) => ({
+    id: col.title.toLowerCase().replace(/\s+/g, '-'),
+    title: col.title,
+    colorClass: col.colorClass,
+    cards: col.cards.map((card) => ({
+      ...card,
+      id: card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    })),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// SortableCard component
+// ---------------------------------------------------------------------------
+
+interface SortableCardProps {
+  card: PipelineCard;
+  isDragOverlay?: boolean;
+}
+
+function SortableCard({ card, isDragOverlay }: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`
+        bg-white rounded-xl border border-forge-border p-3.5
+        transition-all duration-200 cursor-grab
+        ${isDragging ? 'opacity-50 ring-2 ring-forge-teal shadow-lg' : 'hover:shadow-md hover:border-forge-teal/40'}
+        ${isDragOverlay ? 'shadow-xl ring-2 ring-forge-teal rotate-[2deg]' : ''}
+      `}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-start gap-2">
+        {/* Drag handle indicator */}
+        <div className="flex-shrink-0 mt-0.5 text-forge-text-muted/40">
+          <GripVertical size={14} />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-forge-navy mb-1">
+            {card.name}
+          </p>
+          <p className="text-xs text-forge-text-muted mb-3">
+            {card.meta}
+          </p>
+          <p className="font-heading font-bold text-forge-teal">
+            {card.value}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DroppableColumn component
+// ---------------------------------------------------------------------------
+
+interface DroppableColumnProps {
+  column: PipelineColumn;
+  isOverColumn: boolean;
+}
+
+function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
+  const { setNodeRef } = useDroppable({
+    id: column.id,
+  });
+
+  const cardIds = column.cards.map((c) => c.id);
+
+  return (
+    <div className="min-w-[260px] space-y-3">
+      {/* Column Header */}
+      <div
+        className={`bg-white rounded-xl border border-forge-border border-t-4 ${columnBorderColor[column.title] ?? 'border-t-forge-info'} p-4`}
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="font-heading text-sm font-bold text-forge-navy">
+            {column.title}
+          </h3>
+          <span className="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-forge-bg text-xs font-bold text-forge-text-muted">
+            {column.cards.length}
+          </span>
+        </div>
+      </div>
+
+      {/* Droppable zone */}
+      <div
+        ref={setNodeRef}
+        className={`
+          bg-forge-bg rounded-xl p-2 min-h-[80px] space-y-2 transition-colors duration-200
+          ${isOverColumn ? 'bg-forge-teal/5 ring-1 ring-forge-teal/20' : ''}
+        `}
+      >
+        <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+          {column.cards.map((card) => (
+            <SortableCard key={card.id} card={card} />
+          ))}
+        </SortableContext>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main CRM component
+// ---------------------------------------------------------------------------
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState<Tab>('pipeline');
   const [sectorFilter, setSectorFilter] = useState('all');
+
+  // Pipeline state
+  const [columns, setColumns] = useState<PipelineColumn[]>(buildInitialColumns);
+  const [activeCard, setActiveCard] = useState<PipelineCard | null>(null);
+  const [overColumnId, setOverColumnId] = useState<string | null>(null);
+
+  // Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'pipeline', label: 'Pipeline View' },
@@ -22,6 +212,150 @@ export default function CRM() {
       : customers.filter((c) =>
           c.detail.toLowerCase().includes(sectorFilter.toLowerCase())
         );
+
+  // ---------------------------------------------------------------------------
+  // Helpers to find column/card by id
+  // ---------------------------------------------------------------------------
+
+  function findColumnByCardId(cardId: string): PipelineColumn | undefined {
+    return columns.find((col) => col.cards.some((c) => c.id === cardId));
+  }
+
+  function findCardById(cardId: string): PipelineCard | undefined {
+    for (const col of columns) {
+      const card = col.cards.find((c) => c.id === cardId);
+      if (card) return card;
+    }
+    return undefined;
+  }
+
+  function isColumnId(id: string): boolean {
+    return columns.some((col) => col.id === id);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Drag handlers
+  // ---------------------------------------------------------------------------
+
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    const card = findCardById(active.id as string);
+    if (card) {
+      setActiveCard(card);
+    }
+  }
+
+  function handleDragOver(event: DragOverEvent) {
+    const { active, over } = event;
+    if (!over) {
+      setOverColumnId(null);
+      return;
+    }
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Determine source column
+    const sourceColumn = findColumnByCardId(activeId);
+    if (!sourceColumn) return;
+
+    // Determine destination: if overId is a column id, target that column;
+    // otherwise find the column containing the overId card
+    let destColumn: PipelineColumn | undefined;
+    if (isColumnId(overId)) {
+      destColumn = columns.find((col) => col.id === overId);
+    } else {
+      destColumn = findColumnByCardId(overId);
+    }
+
+    if (!destColumn) {
+      setOverColumnId(null);
+      return;
+    }
+
+    setOverColumnId(destColumn.id);
+
+    // Only process cross-column moves
+    if (sourceColumn.id === destColumn.id) return;
+
+    setColumns((prev) => {
+      const newColumns = prev.map((col) => ({
+        ...col,
+        cards: [...col.cards],
+      }));
+
+      const srcCol = newColumns.find((c) => c.id === sourceColumn.id)!;
+      const dstCol = newColumns.find((c) => c.id === destColumn.id)!;
+
+      // Remove from source
+      const srcIndex = srcCol.cards.findIndex((c) => c.id === activeId);
+      if (srcIndex === -1) return prev;
+      const [movedCard] = srcCol.cards.splice(srcIndex, 1);
+
+      // Insert into destination
+      if (isColumnId(overId)) {
+        // Dropped on column itself: append to end
+        dstCol.cards.push(movedCard);
+      } else {
+        // Dropped on a specific card: insert at that position
+        const overIndex = dstCol.cards.findIndex((c) => c.id === overId);
+        if (overIndex === -1) {
+          dstCol.cards.push(movedCard);
+        } else {
+          dstCol.cards.splice(overIndex, 0, movedCard);
+        }
+      }
+
+      return newColumns;
+    });
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    setActiveCard(null);
+    setOverColumnId(null);
+
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // If dropped on the same column, handle reordering within column
+    const sourceColumn = findColumnByCardId(activeId);
+    if (!sourceColumn) return;
+
+    let destColumn: PipelineColumn | undefined;
+    if (isColumnId(overId)) {
+      destColumn = columns.find((col) => col.id === overId);
+    } else {
+      destColumn = findColumnByCardId(overId);
+    }
+
+    if (!destColumn) return;
+
+    // Same column reorder
+    if (sourceColumn.id === destColumn.id && !isColumnId(overId)) {
+      const oldIndex = sourceColumn.cards.findIndex((c) => c.id === activeId);
+      const newIndex = sourceColumn.cards.findIndex((c) => c.id === overId);
+
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+        setColumns((prev) =>
+          prev.map((col) => {
+            if (col.id !== sourceColumn.id) return col;
+            return {
+              ...col,
+              cards: arrayMove(col.cards, oldIndex, newIndex),
+            };
+          })
+        );
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
 
   return (
     <div className="space-y-6">
@@ -44,43 +378,31 @@ export default function CRM() {
 
       {/* Pipeline View */}
       {activeTab === 'pipeline' && (
-        <div className="grid grid-cols-5 gap-4">
-          {pipelineColumns.map((col) => (
-            <div key={col.title} className="space-y-3">
-              {/* Column Header */}
-              <div
-                className={`bg-white rounded-xl border border-forge-border border-t-4 ${col.colorClass} p-4`}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-heading text-sm font-bold text-forge-navy">
-                    {col.title}
-                  </h3>
-                  <span className="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-forge-bg text-xs font-bold text-forge-text-muted">
-                    {col.cards.length}
-                  </span>
-                </div>
-              </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-5 gap-4">
+            {columns.map((col) => (
+              <DroppableColumn
+                key={col.id}
+                column={col}
+                isOverColumn={overColumnId === col.id}
+              />
+            ))}
+          </div>
 
-              {/* Column Cards */}
-              {col.cards.map((card) => (
-                <div
-                  key={card.name}
-                  className="bg-white rounded-xl border border-forge-border p-4 hover:shadow-md hover:border-forge-teal/40 transition-all duration-200 cursor-pointer"
-                >
-                  <p className="font-semibold text-sm text-forge-navy mb-1">
-                    {card.name}
-                  </p>
-                  <p className="text-xs text-forge-text-muted mb-3">
-                    {card.meta}
-                  </p>
-                  <p className="font-heading font-bold text-forge-teal">
-                    {card.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+          <DragOverlay>
+            {activeCard ? (
+              <div className="w-[240px]">
+                <SortableCard card={activeCard} isDragOverlay />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
 
       {/* Customer List */}
