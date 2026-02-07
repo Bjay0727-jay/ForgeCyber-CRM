@@ -1,5 +1,6 @@
 import { teamMembers } from '../data/mockData'
 import Badge from '../components/Badge'
+import { Plus } from 'lucide-react'
 
 function utilizationColor(pct: number) {
   if (pct >= 90) return 'bg-forge-danger'
@@ -10,31 +11,30 @@ function utilizationColor(pct: number) {
 export default function Team() {
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <p className="text-forge-text-muted text-sm">{teamMembers.length} team members</p>
-        </div>
-        <button className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold bg-gradient-to-br from-forge-teal to-forge-teal-light text-white shadow-lg shadow-forge-teal/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-forge-teal/30 transition-all duration-200">
-          Add Team Member
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-sm text-forge-text-muted">{teamMembers.length} team members</p>
+        <button className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors">
+          <Plus size={15} />
+          Add Member
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-4">
         {teamMembers.map((member) => (
-          <div key={member.name} className="bg-white rounded-2xl border border-forge-border p-6">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-forge-teal to-forge-navy-light flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+          <div key={member.name} className="bg-white rounded-xl border border-forge-border shadow-sm p-5">
+            <div className="flex items-start gap-3.5 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-forge-navy flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                 {member.initials}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-forge-navy">{member.name}</h3>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${member.status === 'available' ? 'bg-forge-success' : 'bg-forge-warning'}`} />
-                    <span className="text-xs text-forge-text-muted capitalize">{member.status}</span>
+                  <h3 className="text-sm font-medium text-forge-text">{member.name}</h3>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-2 h-2 rounded-full ${member.status === 'available' ? 'bg-forge-success' : 'bg-forge-warning'}`} />
+                    <span className="text-xs text-forge-text-faint capitalize">{member.status}</span>
                   </div>
                 </div>
-                <p className="text-sm text-forge-text-muted">{member.role}</p>
+                <p className="text-xs text-forge-text-muted mt-0.5">{member.role}</p>
               </div>
             </div>
 
@@ -44,19 +44,19 @@ export default function Team() {
               ))}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <div>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-forge-text-muted font-medium">Utilization</span>
-                  <span className="font-semibold text-forge-navy">{member.utilization}%</span>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-forge-text-muted">Utilization</span>
+                  <span className="font-medium text-forge-text">{member.utilization}%</span>
                 </div>
-                <div className="h-2 bg-forge-bg rounded-full overflow-hidden">
+                <div className="h-1.5 bg-forge-bg rounded-full overflow-hidden">
                   <div className={`h-full rounded-full ${utilizationColor(member.utilization)}`} style={{ width: `${member.utilization}%` }} />
                 </div>
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-forge-border">
                 <span className="text-forge-text-muted">Active Engagements</span>
-                <span className="font-heading font-bold text-forge-navy">{member.activeEngagements}</span>
+                <span className="font-semibold text-forge-text">{member.activeEngagements}</span>
               </div>
             </div>
           </div>

@@ -9,18 +9,18 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  success: 'bg-forge-success/10 text-forge-success',
-  warning: 'bg-forge-warning/10 text-forge-warning',
-  danger: 'bg-forge-danger/10 text-forge-danger',
-  info: 'bg-forge-info/10 text-forge-info',
-  teal: 'bg-forge-teal-glow text-forge-teal',
-  navy: 'bg-forge-navy/10 text-forge-navy',
+  success: 'bg-forge-success/8 text-forge-success border-forge-success/15',
+  warning: 'bg-forge-warning/8 text-forge-warning border-forge-warning/15',
+  danger: 'bg-forge-danger/8 text-forge-danger border-forge-danger/15',
+  info: 'bg-forge-info/8 text-forge-info border-forge-info/15',
+  teal: 'bg-forge-teal-subtle text-forge-teal border-forge-teal/15',
+  navy: 'bg-forge-navy/6 text-forge-navy border-forge-navy/10',
 }
 
 export default function Badge({ variant, children, dot }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${variantClasses[variant]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${variantClasses[variant]}`}
     >
       {dot && (
         <span className="w-1.5 h-1.5 rounded-full bg-current flex-shrink-0" />

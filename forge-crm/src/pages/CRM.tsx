@@ -37,12 +37,12 @@ interface PipelineColumn {
 
 type Tab = 'pipeline' | 'customers' | 'opportunities'
 
-const columnBorderColor: Record<string, string> = {
-  Lead: 'border-t-forge-info',
-  Assessment: 'border-t-forge-warning',
-  Proposal: 'border-t-forge-teal',
-  Negotiation: 'border-t-forge-purple',
-  'Closed Won': 'border-t-forge-success',
+const columnAccent: Record<string, string> = {
+  Lead: 'bg-forge-info',
+  Assessment: 'bg-forge-warning',
+  Proposal: 'bg-forge-teal',
+  Negotiation: 'bg-forge-purple',
+  'Closed Won': 'bg-forge-success',
 }
 
 function buildInitialColumns(): PipelineColumn[] {
@@ -82,28 +82,19 @@ function SortableCard({ card, isDragOverlay }: SortableCardProps) {
       ref={setNodeRef}
       style={style}
       className={`
-        bg-white rounded-xl border border-forge-border p-3.5
-        transition-all duration-200 cursor-grab
-        ${isDragging ? 'opacity-50 ring-2 ring-forge-teal shadow-lg' : 'hover:shadow-md hover:border-forge-teal/40'}
-        ${isDragOverlay ? 'shadow-xl ring-2 ring-forge-teal rotate-[2deg]' : ''}
+        bg-white rounded-lg border border-forge-border p-3 cursor-grab transition-shadow
+        ${isDragging ? 'opacity-40 shadow-md' : 'hover:shadow-sm'}
+        ${isDragOverlay ? 'shadow-lg rotate-1' : ''}
       `}
       {...attributes}
       {...listeners}
     >
       <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 mt-0.5 text-forge-text-muted/40">
-          <GripVertical size={14} />
-        </div>
+        <GripVertical size={14} className="text-forge-text-faint mt-0.5 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-forge-navy mb-1">
-            {card.name}
-          </p>
-          <p className="text-xs text-forge-text-muted mb-3">
-            {card.meta}
-          </p>
-          <p className="font-heading font-bold text-forge-teal">
-            {card.value}
-          </p>
+          <p className="text-sm font-medium text-forge-text mb-0.5">{card.name}</p>
+          <p className="text-xs text-forge-text-muted mb-2">{card.meta}</p>
+          <p className="text-sm font-semibold text-forge-teal">{card.value}</p>
         </div>
       </div>
     </div>
@@ -120,15 +111,12 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
   const cardIds = column.cards.map((c) => c.id)
 
   return (
-    <div className="min-w-[260px] space-y-3">
-      <div
-        className={`bg-white rounded-xl border border-forge-border border-t-4 ${columnBorderColor[column.title] ?? 'border-t-forge-info'} p-4`}
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="font-heading text-sm font-bold text-forge-navy">
-            {column.title}
-          </h3>
-          <span className="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-forge-bg text-xs font-bold text-forge-text-muted">
+    <div className="min-w-[240px] space-y-2">
+      <div className="bg-white rounded-lg border border-forge-border shadow-sm p-3">
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${columnAccent[column.title] ?? 'bg-forge-info'}`} />
+          <h3 className="text-sm font-medium text-forge-text flex-1">{column.title}</h3>
+          <span className="text-xs font-medium text-forge-text-faint bg-forge-bg px-2 py-0.5 rounded">
             {column.cards.length}
           </span>
         </div>
@@ -136,10 +124,9 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
 
       <div
         ref={setNodeRef}
-        className={`
-          bg-forge-bg rounded-xl p-2 min-h-[80px] space-y-2 transition-colors duration-200
-          ${isOverColumn ? 'bg-forge-teal/5 ring-1 ring-forge-teal/20' : ''}
-        `}
+        className={`bg-forge-bg/60 rounded-lg p-2 min-h-[80px] space-y-2 transition-colors ${
+          isOverColumn ? 'bg-forge-teal-subtle ring-1 ring-forge-teal/20' : ''
+        }`}
       >
         <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
           {column.cards.map((card) => (
@@ -163,8 +150,8 @@ export default function CRM() {
   )
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'pipeline', label: 'Pipeline View' },
-    { key: 'customers', label: 'Customer List' },
+    { key: 'pipeline', label: 'Pipeline' },
+    { key: 'customers', label: 'Customers' },
     { key: 'opportunities', label: 'Opportunities' },
   ]
 
@@ -268,17 +255,17 @@ export default function CRM() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Tab Bar */}
-      <div className="flex gap-1 bg-forge-bg p-1 rounded-xl w-fit border border-forge-border">
+      <div className="flex gap-1 border-b border-forge-border">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
               activeTab === tab.key
-                ? 'bg-white shadow-sm text-forge-teal border border-forge-border'
-                : 'text-forge-text-muted hover:text-forge-navy border border-transparent'
+                ? 'border-forge-teal text-forge-teal'
+                : 'border-transparent text-forge-text-muted hover:text-forge-text'
             }`}
           >
             {tab.label}
@@ -295,7 +282,7 @@ export default function CRM() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-5 gap-3">
             {columns.map((col) => (
               <DroppableColumn
                 key={col.id}
@@ -307,7 +294,7 @@ export default function CRM() {
 
           <DragOverlay>
             {activeCard ? (
-              <div className="w-[240px]">
+              <div className="w-[230px]">
                 <SortableCard card={activeCard} isDragOverlay />
               </div>
             ) : null}
@@ -320,16 +307,13 @@ export default function CRM() {
         <Card
           title="All Customers"
           action={
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="relative">
-                <Filter
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-forge-text-muted"
-                />
+                <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-forge-text-faint" />
                 <select
                   value={sectorFilter}
                   onChange={(e) => setSectorFilter(e.target.value)}
-                  className="pl-9 pr-4 py-2 rounded-lg border border-forge-border text-sm text-forge-navy bg-white focus:outline-none focus:border-forge-teal appearance-none cursor-pointer"
+                  className="pl-8 pr-3 py-1.5 rounded-lg border border-forge-border text-sm text-forge-text bg-white focus:outline-none focus:border-forge-teal appearance-none cursor-pointer"
                 >
                   <option value="all">All Sectors</option>
                   <option value="defense">Defense</option>
@@ -337,36 +321,28 @@ export default function CRM() {
                   <option value="financial">Financial</option>
                 </select>
               </div>
-              <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-br from-forge-teal to-forge-teal-light text-white text-sm font-semibold shadow-lg shadow-forge-teal/25 hover:-translate-y-0.5 transition-all duration-200">
-                <Plus size={16} />
+              <button className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors">
+                <Plus size={15} />
                 Add Customer
               </button>
             </div>
           }
         >
-          <div className="space-y-3">
+          <div className="space-y-2">
             {filteredCustomers.map((customer) => (
               <div
                 key={customer.name}
-                className="flex items-center gap-4 p-4 rounded-xl border border-forge-border hover:bg-forge-bg hover:border-forge-teal/30 transition-all cursor-pointer"
+                className="flex items-center gap-4 p-3.5 rounded-lg border border-forge-border hover:bg-forge-bg/50 hover:border-forge-teal/20 transition-all cursor-pointer"
               >
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-forge-navy to-forge-navy-light flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-forge-navy flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                   {customer.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-forge-navy text-sm">
-                    {customer.name}
-                  </p>
-                  <p className="text-xs text-forge-text-muted mt-0.5 truncate">
-                    {customer.detail}
-                  </p>
+                  <p className="text-sm font-medium text-forge-text">{customer.name}</p>
+                  <p className="text-xs text-forge-text-muted mt-0.5 truncate">{customer.detail}</p>
                 </div>
-                <Badge variant={customer.stageType}>
-                  {customer.stage}
-                </Badge>
-                <p className="text-xs text-forge-text-muted whitespace-nowrap">
-                  {customer.lastContact}
-                </p>
+                <Badge variant={customer.stageType}>{customer.stage}</Badge>
+                <p className="text-xs text-forge-text-faint whitespace-nowrap">{customer.lastContact}</p>
               </div>
             ))}
           </div>
@@ -377,14 +353,12 @@ export default function CRM() {
       {activeTab === 'opportunities' && (
         <Card>
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-forge-teal-glow flex items-center justify-center mb-4 animate-float">
-              <Filter size={28} className="text-forge-teal" />
+            <div className="w-12 h-12 rounded-lg bg-forge-teal-subtle flex items-center justify-center mb-4">
+              <Filter size={22} className="text-forge-teal" />
             </div>
-            <h3 className="font-heading text-lg font-bold text-forge-navy mb-2">
-              Opportunities View Coming Soon
-            </h3>
+            <h3 className="text-base font-semibold text-forge-text mb-1">Opportunities Coming Soon</h3>
             <p className="text-sm text-forge-text-muted max-w-md">
-              Track and manage sales opportunities with advanced pipeline analytics, win/loss tracking, and forecasting capabilities.
+              Track and manage sales opportunities with pipeline analytics, win/loss tracking, and forecasting.
             </p>
           </div>
         </Card>

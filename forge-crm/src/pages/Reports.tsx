@@ -2,24 +2,24 @@ import { BarChart3, TrendingUp, PieChart, FileText } from 'lucide-react'
 import Card from '../components/Card'
 
 const metrics = [
-  { label: 'Assessments Completed', value: '142', change: '+18% YoY', icon: BarChart3, color: 'bg-forge-teal-glow text-forge-teal' },
-  { label: 'Avg. Engagement Time', value: '18 days', change: '-12% improvement', icon: TrendingUp, color: 'bg-forge-success/10 text-forge-success' },
-  { label: 'Client Retention', value: '94%', change: '+3% from last quarter', icon: PieChart, color: 'bg-forge-info/10 text-forge-info' },
-  { label: 'Reports Generated', value: '397', change: '+24% this quarter', icon: FileText, color: 'bg-forge-warning/10 text-forge-warning' },
+  { label: 'Assessments Completed', value: '142', change: '+18% YoY', icon: BarChart3, color: 'bg-forge-teal-subtle text-forge-teal' },
+  { label: 'Avg Engagement Time', value: '18 days', change: '-12% improvement', icon: TrendingUp, color: 'bg-forge-success/8 text-forge-success' },
+  { label: 'Client Retention', value: '94%', change: '+3% from last quarter', icon: PieChart, color: 'bg-forge-info/8 text-forge-info' },
+  { label: 'Reports Generated', value: '397', change: '+24% this quarter', icon: FileText, color: 'bg-forge-warning/8 text-forge-warning' },
 ]
 
 export default function Reports() {
   return (
-    <div>
-      <div className="grid grid-cols-4 gap-6 mb-8">
+    <div className="space-y-6">
+      <div className="grid grid-cols-4 gap-4">
         {metrics.map((metric) => (
-          <div key={metric.label} className="bg-white rounded-2xl border border-forge-border p-6">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${metric.color}`}>
-              <metric.icon size={24} />
+          <div key={metric.label} className="bg-white rounded-xl border border-forge-border shadow-sm p-5">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${metric.color}`}>
+              <metric.icon size={20} />
             </div>
-            <div className="text-[13px] text-forge-text-muted font-medium mb-2">{metric.label}</div>
-            <div className="font-heading text-[32px] font-bold text-forge-navy">{metric.value}</div>
-            <div className="text-[13px] text-forge-success flex items-center gap-1 mt-2">{metric.change}</div>
+            <p className="text-xs text-forge-text-muted mb-1">{metric.label}</p>
+            <p className="text-xl font-semibold text-forge-text">{metric.value}</p>
+            <p className="text-xs text-forge-success mt-1.5">{metric.change}</p>
           </div>
         ))}
       </div>
@@ -36,11 +36,11 @@ export default function Reports() {
             ].map((item) => (
               <div key={item.name}>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="font-medium text-forge-navy">{item.name}</span>
+                  <span className="font-medium text-forge-text">{item.name}</span>
                   <span className="text-forge-text-muted">{item.value} ({item.pct}%)</span>
                 </div>
-                <div className="h-2 bg-forge-bg rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-forge-teal to-forge-teal-light rounded-full" style={{ width: `${item.pct * 2.5}%` }} />
+                <div className="h-1.5 bg-forge-bg rounded-full overflow-hidden">
+                  <div className="h-full bg-forge-teal rounded-full" style={{ width: `${item.pct * 2.5}%` }} />
                 </div>
               </div>
             ))}
@@ -48,7 +48,7 @@ export default function Reports() {
         </Card>
 
         <Card title="Assessment Pipeline">
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {[
               { name: 'Completed', count: 142, color: 'bg-forge-success' },
               { name: 'In Progress', count: 8, color: 'bg-forge-teal' },
@@ -57,14 +57,14 @@ export default function Reports() {
               { name: 'Blocked', count: 2, color: 'bg-forge-danger' },
             ].map((item) => (
               <div key={item.name} className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${item.color}`} />
-                <span className="flex-1 text-sm font-medium text-forge-navy">{item.name}</span>
-                <span className="text-sm font-heading font-bold text-forge-navy">{item.count}</span>
+                <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                <span className="flex-1 text-sm text-forge-text">{item.name}</span>
+                <span className="text-sm font-semibold text-forge-text">{item.count}</span>
               </div>
             ))}
           </div>
-          <div className="mt-6 pt-4 border-t border-forge-border text-center">
-            <span className="text-[13px] text-forge-text-muted">Full analytics dashboard with charts coming in v2.0</span>
+          <div className="mt-5 pt-4 border-t border-forge-border text-center">
+            <span className="text-xs text-forge-text-faint">Charts and analytics dashboard coming in v2.0</span>
           </div>
         </Card>
       </div>

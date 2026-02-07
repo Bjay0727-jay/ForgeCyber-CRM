@@ -10,46 +10,41 @@ export default function TopBar({ title, breadcrumb }: TopBarProps) {
   const navigate = useNavigate()
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-forge-border">
-      <div className="flex items-center justify-between px-8 py-4">
-        {/* Left: Title and Breadcrumb */}
-        <div>
-          <h1 className="font-heading text-2xl font-bold text-forge-navy">
-            {title}
-          </h1>
-          <p className="text-[13px] text-forge-text-muted mt-0.5">
-            {breadcrumb}
-          </p>
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-forge-border">
+      <div className="flex items-center justify-between px-8 h-16">
+        {/* Left: Title & Breadcrumb */}
+        <div className="flex items-center gap-4">
+          <div>
+            <p className="text-xs text-forge-text-muted mb-0.5">{breadcrumb}</p>
+            <h1 className="text-base font-semibold text-forge-text leading-tight">{title}</h1>
+          </div>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-4">
-          {/* Search Input */}
+        <div className="flex items-center gap-2">
+          {/* Search */}
           <div className="relative">
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-forge-text-muted"
-            />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-forge-text-faint" />
             <input
               type="text"
-              placeholder="Search customers, assessments..."
-              className="w-[300px] pl-10 pr-4 py-2.5 rounded-xl bg-forge-bg border border-forge-border text-sm text-forge-text placeholder:text-forge-text-muted focus:outline-none focus:ring-2 focus:ring-forge-teal/30 focus:border-forge-teal transition-all"
+              placeholder="Search..."
+              className="w-56 pl-9 pr-3 py-2 rounded-lg bg-forge-bg border border-forge-border text-sm placeholder:text-forge-text-faint focus:outline-none focus:ring-2 focus:ring-forge-teal/20 focus:border-forge-teal transition-colors"
             />
           </div>
 
-          {/* Notification Bell */}
-          <button className="relative p-2.5 rounded-xl hover:bg-forge-bg transition-colors">
-            <Bell size={20} className="text-forge-text-muted" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-forge-danger" />
+          {/* Notifications */}
+          <button className="relative p-2 rounded-lg text-forge-text-muted hover:bg-forge-bg transition-colors">
+            <Bell size={18} />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-forge-danger ring-2 ring-white" />
           </button>
 
-          {/* New Customer Button */}
+          {/* New Customer */}
           <button
             onClick={() => navigate('/intake')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-br from-forge-teal to-forge-teal-light text-white text-sm font-semibold shadow-lg shadow-forge-teal/25 hover:-translate-y-0.5 transition-all duration-200"
+            className="inline-flex items-center gap-1.5 ml-2 px-3.5 py-2 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors"
           >
-            <Plus size={18} />
-            New Customer
+            <Plus size={15} />
+            <span>New Customer</span>
           </button>
         </div>
       </div>

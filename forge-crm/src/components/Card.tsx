@@ -10,16 +10,14 @@ interface CardProps {
 
 export default function Card({ title, action, children, className = '', noPadding }: CardProps) {
   return (
-    <div className={`bg-white rounded-2xl border border-forge-border overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-xl border border-forge-border shadow-sm ${className}`}>
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-forge-border">
-          <h3 className="font-heading text-base font-bold text-forge-navy">
-            {title}
-          </h3>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-forge-border">
+          <h3 className="text-sm font-semibold text-forge-text">{title}</h3>
           {action && <div>{action}</div>}
         </div>
       )}
-      <div className={noPadding ? '' : 'p-6'}>{children}</div>
+      <div className={noPadding ? '' : 'p-5'}>{children}</div>
     </div>
   )
 }

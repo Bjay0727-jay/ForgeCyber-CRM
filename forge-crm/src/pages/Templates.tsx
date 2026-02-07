@@ -1,85 +1,47 @@
 import {
-  ClipboardCheck,
-  FileText,
-  ShieldCheck,
-  AlertTriangle,
-  UserPlus,
-  Settings,
-  Layers,
-  BarChart3,
+  ClipboardCheck, FileText, ShieldCheck, AlertTriangle,
+  UserPlus, Settings, Layers, BarChart3, Download,
 } from 'lucide-react'
 import { templates } from '../data/mockData'
 
-const iconConfig: Record<string, { icon: React.ReactNode; gradient: string }> = {
-  assess: {
-    icon: <ClipboardCheck size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-teal to-forge-teal-light',
-  },
-  report: {
-    icon: <FileText size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-navy to-forge-navy-light',
-  },
-  compliance: {
-    icon: <ShieldCheck size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-purple to-forge-purple/70',
-  },
-  incident: {
-    icon: <AlertTriangle size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-danger to-forge-danger/70',
-  },
-  onboard: {
-    icon: <UserPlus size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-success to-forge-success/70',
-  },
-  ops: {
-    icon: <Settings size={26} className="text-white" />,
-    gradient: 'bg-gradient-to-br from-forge-warning to-forge-warning/70',
-  },
+const iconConfig: Record<string, { icon: React.ReactNode; bgClass: string }> = {
+  assess: { icon: <ClipboardCheck size={22} className="text-forge-teal" />, bgClass: 'bg-forge-teal-subtle' },
+  report: { icon: <FileText size={22} className="text-forge-info" />, bgClass: 'bg-forge-info/8' },
+  compliance: { icon: <ShieldCheck size={22} className="text-forge-purple" />, bgClass: 'bg-forge-purple/8' },
+  incident: { icon: <AlertTriangle size={22} className="text-forge-danger" />, bgClass: 'bg-forge-danger/8' },
+  onboard: { icon: <UserPlus size={22} className="text-forge-success" />, bgClass: 'bg-forge-success/8' },
+  ops: { icon: <Settings size={22} className="text-forge-warning" />, bgClass: 'bg-forge-warning/8' },
 }
 
 export default function Templates() {
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid grid-cols-3 gap-4">
       {templates.map((template) => {
         const config = iconConfig[template.iconType]
         return (
           <div
             key={template.name}
-            className="group bg-white rounded-2xl border border-forge-border overflow-hidden cursor-pointer"
+            className="group bg-white rounded-xl border border-forge-border shadow-sm hover:border-forge-teal/20 hover:shadow-md transition-all cursor-pointer"
           >
-            {/* Accent Bar */}
-            <div
-              className="h-1 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: 'linear-gradient(to right, var(--color-forge-teal), var(--color-forge-teal-light))',
-              }}
-            />
-
-            {/* Content */}
-            <div className="p-6">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${config.gradient}`}>
+            <div className="p-5">
+              <div className={`w-11 h-11 rounded-lg flex items-center justify-center mb-3.5 ${config.bgClass}`}>
                 {config.icon}
               </div>
-              <h3 className="font-heading font-bold text-base text-forge-navy mb-2">
-                {template.name}
-              </h3>
-              <p className="text-[13px] text-forge-text-muted leading-relaxed mb-5">
-                {template.desc}
-              </p>
+              <h3 className="text-sm font-semibold text-forge-text mb-1.5">{template.name}</h3>
+              <p className="text-xs text-forge-text-muted leading-relaxed mb-4">{template.desc}</p>
             </div>
-
-            {/* Meta Footer */}
-            <div className="px-6 py-4 border-t border-forge-border flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs text-forge-text-muted">
-                <Layers size={14} />
-                {template.sections > 0
-                  ? `${template.sections} sections`
-                  : template.domains}
+            <div className="px-5 py-3 border-t border-forge-border bg-forge-bg/30 rounded-b-xl flex items-center justify-between">
+              <span className="flex items-center gap-1 text-xs text-forge-text-faint">
+                <Layers size={12} />
+                {template.sections > 0 ? `${template.sections} sections` : template.domains}
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-forge-text-muted">
-                <BarChart3 size={14} />
-                {template.usageCount} uses
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1 text-xs text-forge-text-faint">
+                  <BarChart3 size={12} />
+                  {template.usageCount} uses
+                </span>
+                <Download size={14} className="text-forge-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
             </div>
           </div>
         )
