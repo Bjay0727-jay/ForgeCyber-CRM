@@ -3,11 +3,10 @@ import {
   ClipboardCheck, FileText, ShieldCheck, AlertTriangle,
   UserPlus, Settings, Layers, BarChart3,
   Search, Plus, X, ArrowUpDown,
-  FileEdit, Trash2, Clock,
+  FileEdit, Trash2, Clock, ArrowRight, Sparkles,
 } from 'lucide-react'
 import { templates as defaultTemplates } from '../data/mockData'
 import { templateStructures } from '../data/templateStructures'
-import Badge from '../components/Badge'
 import TemplateEditor from '../components/TemplateEditor'
 
 type IconType = 'assess' | 'report' | 'compliance' | 'incident' | 'onboard' | 'ops'
@@ -30,17 +29,73 @@ interface SavedDocument {
   data: Record<string, string | string[]>
 }
 
-const iconConfig: Record<IconType, { icon: React.ReactNode; iconSm: React.ReactNode; bgClass: string; label: string }> = {
-  assess: { icon: <ClipboardCheck size={22} className="text-forge-teal" />, iconSm: <ClipboardCheck size={14} className="text-forge-teal" />, bgClass: 'bg-forge-teal-subtle', label: 'Assessment' },
-  report: { icon: <FileText size={22} className="text-forge-info" />, iconSm: <FileText size={14} className="text-forge-info" />, bgClass: 'bg-forge-info/8', label: 'Report' },
-  compliance: { icon: <ShieldCheck size={22} className="text-forge-purple" />, iconSm: <ShieldCheck size={14} className="text-forge-purple" />, bgClass: 'bg-forge-purple/8', label: 'Compliance' },
-  incident: { icon: <AlertTriangle size={22} className="text-forge-danger" />, iconSm: <AlertTriangle size={14} className="text-forge-danger" />, bgClass: 'bg-forge-danger/8', label: 'Incident Response' },
-  onboard: { icon: <UserPlus size={22} className="text-forge-success" />, iconSm: <UserPlus size={14} className="text-forge-success" />, bgClass: 'bg-forge-success/8', label: 'Onboarding' },
-  ops: { icon: <Settings size={22} className="text-forge-warning" />, iconSm: <Settings size={14} className="text-forge-warning" />, bgClass: 'bg-forge-warning/8', label: 'Operations' },
+const iconConfig: Record<IconType, {
+  icon: React.ReactNode
+  iconSm: React.ReactNode
+  bgClass: string
+  label: string
+  color: string
+  gradient: string
+  stripe: string
+}> = {
+  assess: {
+    icon: <ClipboardCheck size={22} className="text-forge-teal" />,
+    iconSm: <ClipboardCheck size={14} className="text-forge-teal" />,
+    bgClass: 'bg-forge-teal-subtle',
+    label: 'Assessment',
+    color: '#0D9488',
+    gradient: 'from-teal-500 to-emerald-500',
+    stripe: 'from-teal-500 via-emerald-400 to-transparent',
+  },
+  report: {
+    icon: <FileText size={22} className="text-forge-info" />,
+    iconSm: <FileText size={14} className="text-forge-info" />,
+    bgClass: 'bg-forge-info/8',
+    label: 'Report',
+    color: '#2563EB',
+    gradient: 'from-blue-500 to-indigo-500',
+    stripe: 'from-blue-500 via-indigo-400 to-transparent',
+  },
+  compliance: {
+    icon: <ShieldCheck size={22} className="text-forge-purple" />,
+    iconSm: <ShieldCheck size={14} className="text-forge-purple" />,
+    bgClass: 'bg-forge-purple/8',
+    label: 'Compliance',
+    color: '#7C3AED',
+    gradient: 'from-purple-500 to-violet-500',
+    stripe: 'from-purple-500 via-violet-400 to-transparent',
+  },
+  incident: {
+    icon: <AlertTriangle size={22} className="text-forge-danger" />,
+    iconSm: <AlertTriangle size={14} className="text-forge-danger" />,
+    bgClass: 'bg-forge-danger/8',
+    label: 'Incident Response',
+    color: '#DC2626',
+    gradient: 'from-red-500 to-rose-500',
+    stripe: 'from-red-500 via-rose-400 to-transparent',
+  },
+  onboard: {
+    icon: <UserPlus size={22} className="text-forge-success" />,
+    iconSm: <UserPlus size={14} className="text-forge-success" />,
+    bgClass: 'bg-forge-success/8',
+    label: 'Onboarding',
+    color: '#059669',
+    gradient: 'from-emerald-500 to-green-500',
+    stripe: 'from-emerald-500 via-green-400 to-transparent',
+  },
+  ops: {
+    icon: <Settings size={22} className="text-forge-warning" />,
+    iconSm: <Settings size={14} className="text-forge-warning" />,
+    bgClass: 'bg-forge-warning/8',
+    label: 'Operations',
+    color: '#D97706',
+    gradient: 'from-amber-500 to-orange-500',
+    stripe: 'from-amber-500 via-orange-400 to-transparent',
+  },
 }
 
 const categories = [
-  { key: 'all', label: 'All' },
+  { key: 'all', label: 'All Templates' },
   { key: 'assess', label: 'Assessment' },
   { key: 'report', label: 'Report' },
   { key: 'compliance', label: 'Compliance' },
@@ -154,43 +209,52 @@ export default function Templates() {
 
   return (
     <div className="space-y-6">
-      {/* Stats row */}
+      {/* Stats row with colored accents */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-forge-border shadow-sm p-5 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-lg bg-forge-teal-subtle flex items-center justify-center">
-            <Layers size={20} className="text-forge-teal" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-forge-text">{templateList.length}</p>
-            <p className="text-xs text-forge-text-muted">Templates</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-forge-border shadow-sm p-5 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-lg bg-forge-info/8 flex items-center justify-center">
-            <BarChart3 size={20} className="text-forge-info" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-forge-text">{totalUsage}</p>
-            <p className="text-xs text-forge-text-muted">Total Uses</p>
+        <div className="bg-white rounded-xl border border-forge-border shadow-sm overflow-hidden group hover:shadow-md hover:border-forge-teal/20 transition-all">
+          <div className="h-1 bg-gradient-to-r from-forge-teal via-emerald-400 to-transparent" />
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-forge-teal/10 to-forge-teal/5 flex items-center justify-center border border-forge-teal/10">
+              <Layers size={22} className="text-forge-teal" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-forge-text">{templateList.length}</p>
+              <p className="text-xs text-forge-text-muted font-medium">Templates</p>
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-forge-border shadow-sm p-5 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-lg bg-forge-success/8 flex items-center justify-center">
-            <FileEdit size={20} className="text-forge-success" />
+        <div className="bg-white rounded-xl border border-forge-border shadow-sm overflow-hidden group hover:shadow-md hover:border-forge-info/20 transition-all">
+          <div className="h-1 bg-gradient-to-r from-forge-info via-blue-400 to-transparent" />
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-forge-info/10 to-forge-info/5 flex items-center justify-center border border-forge-info/10">
+              <BarChart3 size={22} className="text-forge-info" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-forge-text">{totalUsage}</p>
+              <p className="text-xs text-forge-text-muted font-medium">Total Uses</p>
+            </div>
           </div>
-          <div>
-            <p className="text-2xl font-bold text-forge-text">{savedDocs.length}</p>
-            <p className="text-xs text-forge-text-muted">Documents</p>
+        </div>
+        <div className="bg-white rounded-xl border border-forge-border shadow-sm overflow-hidden group hover:shadow-md hover:border-forge-success/20 transition-all">
+          <div className="h-1 bg-gradient-to-r from-forge-success via-green-400 to-transparent" />
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-forge-success/10 to-forge-success/5 flex items-center justify-center border border-forge-success/10">
+              <FileEdit size={22} className="text-forge-success" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-forge-text">{savedDocs.length}</p>
+              <p className="text-xs text-forge-text-muted font-medium">Documents</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Recent documents — always visible when docs exist */}
+      {/* Recent documents */}
       {savedDocs.length > 0 && (
-        <div className="bg-white rounded-xl border border-forge-border shadow-sm">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-forge-border">
+        <div className="bg-white rounded-xl border border-forge-border shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-forge-border bg-gradient-to-r from-forge-bg/50 to-transparent">
             <h3 className="text-sm font-semibold text-forge-text flex items-center gap-2">
-              <Clock size={14} className="text-forge-text-faint" />
+              <Clock size={14} className="text-forge-teal" />
               Recent Documents
             </h3>
             <span className="text-xs text-forge-text-faint">{savedDocs.length} saved</span>
@@ -234,7 +298,7 @@ export default function Templates() {
             placeholder="Search templates..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2.5 border border-forge-border rounded-lg text-sm focus:ring-2 focus:ring-forge-teal/20 focus:border-forge-teal outline-none transition-colors"
+            className="w-full pl-9 pr-3 py-2.5 border border-forge-border rounded-lg text-sm focus:ring-2 focus:ring-forge-teal/20 focus:border-forge-teal outline-none transition-colors bg-white"
           />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-forge-text-faint hover:text-forge-text">
@@ -261,29 +325,41 @@ export default function Templates() {
         <div className="flex-1" />
         <button
           onClick={() => setShowCreate(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-gradient-to-r from-forge-teal to-emerald-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-forge-teal/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
           <Plus size={15} />
           New Template
         </button>
       </div>
 
-      {/* Category tabs */}
+      {/* Category tabs with colored indicators */}
       <div className="flex gap-1 border-b border-forge-border overflow-x-auto">
         {categories.map((cat) => {
           const count = cat.key === 'all' ? templateList.length : templateList.filter(t => t.iconType === cat.key).length
+          const catColor = cat.key !== 'all' ? iconConfig[cat.key as IconType]?.color : undefined
           return (
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className={`px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3.5 py-2.5 text-sm font-medium border-b-[3px] -mb-px transition-colors whitespace-nowrap ${
                 activeCategory === cat.key
-                  ? 'border-forge-teal text-forge-teal'
+                  ? 'text-forge-text'
                   : 'border-transparent text-forge-text-muted hover:text-forge-text hover:border-forge-border'
               }`}
+              style={activeCategory === cat.key ? { borderColor: catColor ?? '#0D9488' } : undefined}
             >
+              {cat.key !== 'all' && (
+                <span
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: catColor }}
+                />
+              )}
               {cat.label}
-              <span className={`ml-1.5 text-xs ${activeCategory === cat.key ? 'text-forge-teal/70' : 'text-forge-text-faint'}`}>
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                activeCategory === cat.key
+                  ? 'bg-forge-text/5 text-forge-text'
+                  : 'text-forge-text-faint'
+              }`}>
                 {count}
               </span>
             </button>
@@ -318,42 +394,76 @@ export default function Templates() {
             return (
               <div
                 key={template.name}
-                className="group bg-white rounded-xl border border-forge-border shadow-sm hover:shadow-md hover:border-forge-teal/25 transition-all"
+                className="group bg-white rounded-xl border border-forge-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
+                {/* Colored top stripe */}
+                <div className={`h-1.5 bg-gradient-to-r ${cfg.stripe}`} />
+
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${cfg.bgClass}`}>
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-110"
+                      style={{
+                        backgroundColor: `${cfg.color}10`,
+                        borderColor: `${cfg.color}15`,
+                      }}
+                    >
                       {cfg.icon}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      {isPopular && <Badge variant="warning">Popular</Badge>}
-                      <Badge variant="teal">{cfg.label}</Badge>
+                      {isPopular && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 border border-amber-200/60">
+                          <Sparkles size={10} />
+                          Popular
+                        </span>
+                      )}
+                      <span
+                        className="px-2 py-0.5 text-[10px] font-semibold rounded-full border"
+                        style={{
+                          backgroundColor: `${cfg.color}08`,
+                          borderColor: `${cfg.color}20`,
+                          color: cfg.color,
+                        }}
+                      >
+                        {cfg.label}
+                      </span>
                     </div>
                   </div>
-                  <h3 className="text-sm font-semibold text-forge-text mb-1">{template.name}</h3>
-                  <p className="text-xs text-forge-text-muted leading-relaxed line-clamp-2 mb-4">{template.desc}</p>
-                  <div className="flex items-center gap-2 text-xs text-forge-text-faint mb-4">
-                    <span className="flex items-center gap-1">
+
+                  <h3 className="text-sm font-bold text-forge-text mb-1.5 group-hover:text-forge-teal transition-colors">
+                    {template.name}
+                  </h3>
+                  <p className="text-xs text-forge-text-muted leading-relaxed line-clamp-2 mb-4">
+                    {template.desc}
+                  </p>
+
+                  <div className="flex items-center gap-3 text-xs text-forge-text-faint mb-4">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-forge-bg">
                       <Layers size={11} />
                       {template.sections > 0 ? `${template.sections} sections` : template.domains}
                     </span>
-                    <span className="text-forge-border">&middot;</span>
-                    <span className="flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-forge-bg">
                       <BarChart3 size={11} />
                       {template.usageCount} uses
                     </span>
                   </div>
+
                   {hasStructure ? (
                     <button
                       onClick={() => openEditor(template)}
-                      className="w-full py-2.5 text-sm font-medium rounded-lg bg-forge-teal text-white hover:bg-forge-teal/90 transition-colors"
+                      className="w-full py-2.5 text-sm font-semibold rounded-lg text-white flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: `linear-gradient(135deg, ${cfg.color}, ${cfg.color}dd)`,
+                        boxShadow: `0 4px 12px ${cfg.color}25`,
+                      }}
                     >
                       Use Template
+                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                     </button>
                   ) : (
                     <button
                       disabled
-                      className="w-full py-2.5 text-sm font-medium rounded-lg border border-forge-border text-forge-text-faint cursor-not-allowed"
+                      className="w-full py-2.5 text-sm font-medium rounded-lg border border-dashed border-forge-border text-forge-text-faint cursor-not-allowed"
                     >
                       Coming Soon
                     </button>
@@ -369,9 +479,10 @@ export default function Templates() {
       {showCreate && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={() => { setShowCreate(false); setForm(emptyForm); setFormError('') }}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-          <div className="relative bg-white rounded-xl shadow-xl border border-forge-border w-full max-w-lg mx-4" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-forge-border">
-              <h3 className="text-base font-semibold text-forge-text">Create New Template</h3>
+          <div className="relative bg-white rounded-xl shadow-2xl border border-forge-border w-full max-w-lg mx-4 animate-scaleIn" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-forge-border bg-gradient-to-r from-forge-bg/50 to-transparent rounded-t-xl">
+              <h3 className="text-base font-bold text-forge-text">Create New Template</h3>
+              <p className="text-xs text-forge-text-muted mt-0.5">Add a custom template to your library</p>
             </div>
             <div className="p-6 space-y-4">
               {formError && (
@@ -403,10 +514,10 @@ export default function Templates() {
               </div>
             </div>
             <div className="px-6 py-4 border-t border-forge-border flex justify-end gap-3">
-              <button onClick={() => { setShowCreate(false); setForm(emptyForm); setFormError('') }} className="px-4 py-2 text-sm font-medium border border-forge-border rounded-lg text-forge-text hover:bg-forge-bg transition-colors">Cancel</button>
-              <button onClick={handleCreate} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-forge-teal text-white hover:bg-forge-teal/90 transition-colors">
+              <button onClick={() => { setShowCreate(false); setForm(emptyForm); setFormError('') }} className="px-4 py-2.5 text-sm font-medium border border-forge-border rounded-lg text-forge-text hover:bg-forge-bg transition-colors">Cancel</button>
+              <button onClick={handleCreate} className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-forge-teal to-emerald-600 text-white hover:shadow-lg hover:shadow-forge-teal/20 transition-all">
                 <Plus size={14} />
-                Create
+                Create Template
               </button>
             </div>
           </div>
