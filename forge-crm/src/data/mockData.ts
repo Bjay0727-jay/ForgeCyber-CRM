@@ -114,6 +114,24 @@ export const templates = [
   { name: 'HIPAA Gap Analysis', desc: 'Administrative, physical, and technical safeguard assessment mapped to HIPAA Security Rule.', iconType: 'compliance' as const, sections: 75, domains: '3 safeguard areas', usageCount: 35 },
   { name: 'Monthly Security Report', desc: 'Recurring managed services report with KPI tracking, incident summary, and trend analysis.', iconType: 'report' as const, sections: 10, domains: 'KPI tracking', usageCount: 89 },
   { name: 'POA&M Template', desc: 'Plan of Action and Milestones tracker with timeline calculator and resource allocation.', iconType: 'ops' as const, sections: 0, domains: 'Timeline calculator', usageCount: 67 },
+  // Assessment
+  { name: 'Penetration Test Report', desc: 'Structured findings report for network, web app, and API penetration tests with attack narratives and proof-of-concept details.', iconType: 'assess' as const, sections: 15, domains: 'OWASP Top 10', usageCount: 41 },
+  { name: 'Third-Party Risk Assessment', desc: 'Vendor and supply chain security evaluation covering data handling, access controls, and contractual obligations.', iconType: 'assess' as const, sections: 18, domains: '5 risk categories', usageCount: 22 },
+  // Report
+  { name: 'Board Cybersecurity Brief', desc: 'Concise board-level presentation template with risk posture summary, key metrics, and strategic recommendations.', iconType: 'report' as const, sections: 6, domains: '8-10 slides', usageCount: 15 },
+  { name: 'Quarterly Business Review', desc: 'QBR template for managed services clients with SLA performance, incident trends, and roadmap updates.', iconType: 'report' as const, sections: 12, domains: 'SLA metrics', usageCount: 38 },
+  // Compliance
+  { name: 'NIST 800-171 Self-Assessment', desc: 'Full 110-control assessment against NIST SP 800-171 Rev 2 for CUI protection with SPRS scoring calculator.', iconType: 'compliance' as const, sections: 110, domains: '14 families', usageCount: 31 },
+  { name: 'SOC 2 Readiness Assessment', desc: 'Trust Services Criteria evaluation covering security, availability, processing integrity, confidentiality, and privacy.', iconType: 'compliance' as const, sections: 64, domains: '5 TSC categories', usageCount: 18 },
+  { name: 'PCI-DSS v4.0 Gap Analysis', desc: 'Payment card industry compliance assessment mapped to all 12 PCI-DSS requirements with compensating controls guidance.', iconType: 'compliance' as const, sections: 78, domains: '12 requirements', usageCount: 26 },
+  // Incident Response
+  { name: 'Incident Post-Mortem Report', desc: 'After-action report template with timeline reconstruction, root cause analysis, lessons learned, and remediation tracking.', iconType: 'incident' as const, sections: 8, domains: '5 phases', usageCount: 14 },
+  { name: 'Tabletop Exercise Guide', desc: 'Facilitation guide for cybersecurity tabletop exercises with scenario scripts, injects, and participant evaluation forms.', iconType: 'incident' as const, sections: 10, domains: '6 scenarios', usageCount: 11 },
+  // Onboarding
+  { name: 'Service Transition Runbook', desc: 'Step-by-step operational handoff guide for transitioning clients from assessment phase to managed security services.', iconType: 'onboard' as const, sections: 14, domains: 'Checklist', usageCount: 20 },
+  // Operations
+  { name: 'Statement of Work', desc: 'Customizable SOW template with scope definition, deliverables matrix, milestones, pricing, and terms for security engagements.', iconType: 'ops' as const, sections: 9, domains: 'Legal review', usageCount: 53 },
+  { name: 'Change Management Request', desc: 'Structured change request form with risk assessment, rollback plan, approval workflow, and implementation checklist.', iconType: 'ops' as const, sections: 7, domains: 'ITIL aligned', usageCount: 34 },
 ]
 
 export const operationsEngagements = [
