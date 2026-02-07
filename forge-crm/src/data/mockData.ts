@@ -1,8 +1,8 @@
 export const dashboardStats = [
-  { label: 'Active Customers', value: '24', change: '12% from last month', positive: true, icon: 'users', highlight: true },
-  { label: 'Assessments In Progress', value: '8', change: '4 due this week', positive: null, icon: 'clipboard-check' },
-  { label: 'Reports Pending', value: '6', change: '2 overdue', positive: false, icon: 'file-text' },
-  { label: 'Pipeline Value', value: '$1.2M', change: '18% growth', positive: true, icon: 'dollar-sign' },
+  { label: 'Active Customers', value: '24', change: '12% from last month', positive: true, icon: 'users', highlight: true, link: '/crm' },
+  { label: 'Assessments In Progress', value: '8', change: '4 due this week', positive: null, icon: 'clipboard-check', link: '/assessments' },
+  { label: 'Reports Pending', value: '6', change: '2 overdue', positive: false, icon: 'file-text', link: '/reports' },
+  { label: 'Pipeline Value', value: '$1.2M', change: '18% growth', positive: true, icon: 'dollar-sign', link: '/crm' },
 ]
 
 export const engagements = [

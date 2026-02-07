@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import {
   Users,
   ClipboardCheck,
@@ -9,6 +10,7 @@ import {
   AlertTriangle,
   ArrowUpRight,
   ArrowDownRight,
+  ChevronRight,
 } from 'lucide-react'
 import { dashboardStats, engagements, activities } from '../data/mockData'
 import Badge from '../components/Badge'
@@ -28,6 +30,13 @@ const iconBgMap: Record<string, string> = {
   'dollar-sign': 'bg-forge-success/8 text-forge-success',
 }
 
+const cardAccent: Record<string, string> = {
+  users: 'from-teal-500 via-emerald-400 to-transparent',
+  'clipboard-check': 'from-blue-500 via-indigo-400 to-transparent',
+  'file-text': 'from-amber-500 via-orange-400 to-transparent',
+  'dollar-sign': 'from-emerald-500 via-green-400 to-transparent',
+}
+
 const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = {
   complete: { icon: <CheckCircle2 size={16} />, color: 'text-forge-teal bg-forge-teal-subtle' },
   create: { icon: <PlusCircle size={16} />, color: 'text-forge-success bg-forge-success/8' },
@@ -36,29 +45,41 @@ const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = 
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate()
+
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {dashboardStats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl border border-forge-border shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconBgMap[stat.icon] || 'bg-forge-bg text-forge-text-muted'}`}>
-                {iconMap[stat.icon]}
+          <button
+            key={stat.label}
+            onClick={() => stat.link && navigate(stat.link)}
+            className="group bg-white rounded-xl border border-forge-border shadow-sm overflow-hidden text-left hover:shadow-lg hover:-translate-y-0.5 hover:border-forge-teal/20 transition-all duration-200 cursor-pointer"
+          >
+            <div className={`h-1 bg-gradient-to-r ${cardAccent[stat.icon] || 'from-forge-border to-transparent'}`} />
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 ${iconBgMap[stat.icon] || 'bg-forge-bg text-forge-text-muted'}`}>
+                  {iconMap[stat.icon]}
+                </div>
+                <div className="flex items-center gap-2">
+                  {stat.positive !== null && (
+                    <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${stat.positive ? 'text-forge-success' : 'text-forge-danger'}`}>
+                      {stat.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                      {stat.change}
+                    </span>
+                  )}
+                  <ChevronRight size={14} className="text-forge-text-faint opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                </div>
               </div>
-              {stat.positive !== null && (
-                <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${stat.positive ? 'text-forge-success' : 'text-forge-danger'}`}>
-                  {stat.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                  {stat.change}
-                </span>
+              <p className="text-2xl font-bold text-forge-text tracking-tight group-hover:text-forge-teal transition-colors">{stat.value}</p>
+              <p className="text-xs text-forge-text-muted mt-1 font-medium">{stat.label}</p>
+              {stat.positive === null && (
+                <p className="text-xs text-forge-text-faint mt-1">{stat.change}</p>
               )}
             </div>
-            <p className="text-2xl font-semibold text-forge-text tracking-tight">{stat.value}</p>
-            <p className="text-xs text-forge-text-muted mt-1">{stat.label}</p>
-            {stat.positive === null && (
-              <p className="text-xs text-forge-text-faint mt-1">{stat.change}</p>
-            )}
-          </div>
+          </button>
         ))}
       </div>
 
@@ -69,8 +90,12 @@ export default function Dashboard() {
           title="Active Engagements"
           noPadding
           action={
-            <button className="text-xs font-medium text-forge-teal hover:text-forge-teal/80 transition-colors">
+            <button
+              onClick={() => navigate('/workflow')}
+              className="text-xs font-medium text-forge-teal hover:text-forge-teal/80 transition-colors inline-flex items-center gap-1"
+            >
               View All
+              <ChevronRight size={12} />
             </button>
           }
         >
@@ -86,7 +111,7 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {engagements.map((eng) => (
-                <tr key={eng.customer} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
+                <tr key={eng.customer} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors cursor-pointer">
                   <td className="py-3 px-5 text-sm font-medium text-forge-text">{eng.customer}</td>
                   <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.type}</td>
                   <td className="py-3 px-5"><Badge variant={eng.statusType} dot>{eng.status}</Badge></td>
