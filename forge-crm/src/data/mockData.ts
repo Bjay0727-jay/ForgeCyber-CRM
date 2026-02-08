@@ -164,6 +164,44 @@ export const securityDomains = [
   'Data Protection',
 ]
 
+export type UserRole = 'admin' | 'consultant' | 'sales' | 'analyst'
+
+export interface Notification {
+  id: string
+  type: 'incident' | 'deadline' | 'sla' | 'client' | 'system'
+  title: string
+  body: string
+  time: string
+  read: boolean
+  link?: string
+  severity?: 'critical' | 'warning' | 'info'
+}
+
+export const notifications: Notification[] = [
+  { id: 'n1', type: 'incident', title: 'Critical: Ransomware Detection', body: 'ForgeSOC detected ransomware activity at First National Bank endpoint cluster.', time: '12 min ago', read: false, link: '/operations', severity: 'critical' },
+  { id: 'n2', type: 'deadline', title: 'Assessment Due Tomorrow', body: 'CMMC 2.0 Assessment for Raytheon Intelligence due Jan 15, 2026.', time: '1 hour ago', read: false, link: '/assessments', severity: 'warning' },
+  { id: 'n3', type: 'sla', title: 'SLA Breach Warning', body: 'DOD Contractor Alpha RMF Assessment blocked for 48+ hours — approaching SLA threshold.', time: '2 hours ago', read: false, link: '/operations', severity: 'warning' },
+  { id: 'n4', type: 'client', title: 'New Client Signed', body: 'General Dynamics IT signed enterprise license — $420K annual value.', time: '4 hours ago', read: true, link: '/crm', severity: 'info' },
+  { id: 'n5', type: 'system', title: 'ForgeScan 360 Update', body: 'Vulnerability scanner signatures updated to v4.12.3 with 23 new CVE detections.', time: 'Yesterday', read: true, severity: 'info' },
+  { id: 'n6', type: 'deadline', title: 'QBR Report Due', body: 'Quarterly Business Review for Texas Health Resources due in 3 days.', time: 'Yesterday', read: true, link: '/reports', severity: 'info' },
+  { id: 'n7', type: 'incident', title: 'Phishing Campaign Detected', body: '14 targeted phishing emails blocked at Baylor Scott & White. Investigation ongoing.', time: '2 days ago', read: true, link: '/operations', severity: 'warning' },
+]
+
+// Role-based navigation access
+export const roleAccess: Record<UserRole, string[]> = {
+  admin: ['/dashboard', '/crm', '/intake', '/assessments', '/workflow', '/templates', '/operations', '/reports', '/team', '/settings'],
+  consultant: ['/dashboard', '/assessments', '/workflow', '/templates', '/operations', '/reports'],
+  sales: ['/dashboard', '/crm', '/intake', '/reports'],
+  analyst: ['/dashboard', '/assessments', '/templates', '/reports'],
+}
+
+export const roleLabels: Record<UserRole, string> = {
+  admin: 'Administrator',
+  consultant: 'Consultant',
+  sales: 'Sales',
+  analyst: 'Analyst',
+}
+
 export const sampleFindings = [
   { severity: 'critical' as const, title: 'Unpatched Domain Controllers', desc: 'Two domain controllers running outdated OS versions with known CVEs. NIST Control: SI-2', nist: 'SI-2' },
   { severity: 'high' as const, title: 'Weak Password Policy', desc: 'Current policy allows 8-char passwords with no complexity. NIST Control: IA-5', nist: 'IA-5' },

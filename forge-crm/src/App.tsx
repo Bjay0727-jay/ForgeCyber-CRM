@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
@@ -26,11 +27,12 @@ const pages: Record<string, { title: string; breadcrumb: string }> = {
 export default function App() {
   const location = useLocation()
   const page = pages[location.pathname] || pages['/dashboard']
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
     <div className="flex min-h-screen bg-forge-bg">
-      <Sidebar />
-      <main className="flex-1 min-h-screen ml-[260px]">
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(prev => !prev)} />
+      <main className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]'}`}>
         <TopBar title={page.title} breadcrumb={page.breadcrumb} />
         <div className="p-6" key={location.pathname}>
           <Routes>
