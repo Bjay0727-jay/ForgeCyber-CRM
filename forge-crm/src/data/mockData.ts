@@ -189,7 +189,7 @@ export const notifications: Notification[] = [
 
 // Role-based navigation access
 export const roleAccess: Record<UserRole, string[]> = {
-  admin: ['/dashboard', '/crm', '/intake', '/assessments', '/workflow', '/templates', '/operations', '/reports', '/team', '/settings'],
+  admin: ['/dashboard', '/crm', '/intake', '/assessments', '/workflow', '/templates', '/operations', '/reports', '/team', '/settings', '/audit-log'],
   consultant: ['/dashboard', '/assessments', '/workflow', '/templates', '/operations', '/reports'],
   sales: ['/dashboard', '/crm', '/intake', '/reports'],
   analyst: ['/dashboard', '/assessments', '/templates', '/reports'],
@@ -217,6 +217,51 @@ export const tenants: Tenant[] = [
   { id: 'texas-health', name: 'Texas Health Resources', industry: 'Healthcare', initials: 'TH', color: '#059669' },
   { id: 'first-national', name: 'First National Bank', industry: 'Financial', initials: 'FN', color: '#D97706' },
   { id: 'lockheed', name: 'Lockheed Martin', industry: 'Defense', initials: 'LM', color: '#7C3AED' },
+]
+
+// Audit log entries
+export interface AuditEntry {
+  id: string
+  action: 'create' | 'update' | 'delete' | 'access' | 'login' | 'export' | 'config'
+  user: string
+  target: string
+  detail: string
+  timestamp: string
+  ip?: string
+}
+
+export const auditLog: AuditEntry[] = [
+  { id: 'a1', action: 'login', user: 'Brandon Jay', target: 'Portal', detail: 'Successful login via SSO', timestamp: 'Jan 10, 2026 09:12 AM', ip: '192.168.1.45' },
+  { id: 'a2', action: 'create', user: 'Michael Torres', target: 'Assessment', detail: 'Created CMMC 2.0 Assessment for Raytheon Intelligence', timestamp: 'Jan 10, 2026 09:30 AM' },
+  { id: 'a3', action: 'export', user: 'Sarah Mitchell', target: 'Report', detail: 'Exported HIPAA Gap Analysis report as PDF', timestamp: 'Jan 10, 2026 10:15 AM' },
+  { id: 'a4', action: 'update', user: 'Emily Chen', target: 'Template', detail: 'Modified NIST 800-171 Self-Assessment template', timestamp: 'Jan 10, 2026 11:00 AM' },
+  { id: 'a5', action: 'access', user: 'James Wilson', target: 'Client Data', detail: 'Accessed First National Bank vulnerability scan results', timestamp: 'Jan 10, 2026 11:45 AM', ip: '10.0.0.22' },
+  { id: 'a6', action: 'config', user: 'Brandon Jay', target: 'Settings', detail: 'Updated notification preferences for SLA alerts', timestamp: 'Jan 10, 2026 01:20 PM' },
+  { id: 'a7', action: 'delete', user: 'Brandon Jay', target: 'Document', detail: 'Deleted draft "Q4 Security Review" from Templates', timestamp: 'Jan 10, 2026 02:00 PM' },
+  { id: 'a8', action: 'create', user: 'Amanda Patel', target: 'Client', detail: 'Added new prospect General Dynamics IT to pipeline', timestamp: 'Jan 10, 2026 02:30 PM' },
+  { id: 'a9', action: 'login', user: 'David Kim', target: 'Portal', detail: 'Successful login from mobile device', timestamp: 'Jan 10, 2026 03:15 PM', ip: '172.16.0.8' },
+  { id: 'a10', action: 'update', user: 'Michael Torres', target: 'Assessment', detail: 'Updated Raytheon CMMC assessment progress to 65%', timestamp: 'Jan 10, 2026 03:45 PM' },
+  { id: 'a11', action: 'export', user: 'Emily Chen', target: 'Report', detail: 'Exported POA&M tracker for DOD Contractor Alpha', timestamp: 'Jan 10, 2026 04:00 PM' },
+  { id: 'a12', action: 'access', user: 'Sarah Mitchell', target: 'Client Data', detail: 'Accessed Texas Health Resources assessment dashboard', timestamp: 'Jan 10, 2026 04:30 PM' },
+]
+
+// API/Integration statuses
+export interface Integration {
+  id: string
+  name: string
+  type: 'scanner' | 'siem' | 'ticketing' | 'email' | 'cloud'
+  status: 'connected' | 'degraded' | 'disconnected'
+  lastSync: string
+  version?: string
+}
+
+export const integrations: Integration[] = [
+  { id: 'i1', name: 'ForgeScan 360', type: 'scanner', status: 'connected', lastSync: '2 min ago', version: 'v4.12.3' },
+  { id: 'i2', name: 'Splunk SIEM', type: 'siem', status: 'connected', lastSync: '5 min ago', version: 'v9.1' },
+  { id: 'i3', name: 'ServiceNow', type: 'ticketing', status: 'degraded', lastSync: '45 min ago', version: 'v3.2' },
+  { id: 'i4', name: 'Microsoft 365', type: 'email', status: 'connected', lastSync: '1 min ago' },
+  { id: 'i5', name: 'AWS Security Hub', type: 'cloud', status: 'connected', lastSync: '8 min ago' },
+  { id: 'i6', name: 'Qualys VMDR', type: 'scanner', status: 'disconnected', lastSync: '3 hours ago', version: 'v2.8' },
 ]
 
 export const sampleFindings = [

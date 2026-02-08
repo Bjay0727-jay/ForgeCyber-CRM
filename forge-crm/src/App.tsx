@@ -11,6 +11,7 @@ import Templates from './pages/Templates'
 import Operations from './pages/Operations'
 import Reports from './pages/Reports'
 import Team from './pages/Team'
+import AuditLog from './pages/AuditLog'
 
 const pages: Record<string, { title: string; breadcrumb: string }> = {
   '/dashboard': { title: 'Service Delivery Dashboard', breadcrumb: 'Home / Dashboard' },
@@ -22,6 +23,7 @@ const pages: Record<string, { title: string; breadcrumb: string }> = {
   '/operations': { title: 'Operations Management', breadcrumb: 'Home / Operations' },
   '/reports': { title: 'Reports & Analytics', breadcrumb: 'Home / Reports' },
   '/team': { title: 'Team Management', breadcrumb: 'Home / Admin / Team' },
+  '/audit-log': { title: 'Audit Log', breadcrumb: 'Home / Admin / Audit Log' },
 }
 
 export default function App() {
@@ -45,6 +47,7 @@ export default function App() {
             <Route path="/operations" element={<Operations />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/team" element={<Team />} />
+            <Route path="/audit-log" element={<AuditLog />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
