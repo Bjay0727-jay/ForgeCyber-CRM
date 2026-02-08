@@ -1,19 +1,24 @@
-import { useState, useEffect, useCallback } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, UserPlus, ClipboardCheck, GitBranch,
   FileText, Briefcase, BarChart3, UsersRound, Settings, Shield,
-  Search, Bell, ChevronDown, LogOut, HelpCircle, Moon,
-  Zap, ChevronRight, ExternalLink, PanelLeftClose, PanelLeftOpen,
-  Star, StarOff,
+  Search, Bell, ChevronDown, LogOut, HelpCircle, Moon, Sun,
+  Zap, ExternalLink, PanelLeftClose, PanelLeftOpen,
+  Star, StarOff, Check,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { notifications as defaultNotifications, roleAccess, roleLabels } from '../data/mockData'
-import type { UserRole, Notification } from '../data/mockData'
+import {
+  notifications as defaultNotifications, roleAccess, roleLabels,
+  pipelineColumns, activeAssessments, operationsEngagements,
+  tenants,
+} from '../data/mockData'
+import type { UserRole, Notification, Tenant } from '../data/mockData'
+import { useTheme } from '../context/ThemeContext'
 import CommandPalette from './CommandPalette'
 import NotificationPanel from './NotificationPanel'
 
-interface NavItem { label: string; icon: ReactNode; to: string; badge?: number; badgeColor?: string }
+interface NavItem { label: string; icon: ReactNode; to: string; badgeKey?: string; badgeColor?: string }
 interface NavGroup { heading: string; items: NavItem[] }
 
 const allNavGroups: NavGroup[] = [
@@ -21,16 +26,16 @@ const allNavGroups: NavGroup[] = [
     { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/dashboard' },
   ]},
   { heading: 'Customer Management', items: [
-    { label: 'CRM / Pipeline', icon: <Users size={18} />, to: '/crm', badge: 12, badgeColor: 'teal' },
+    { label: 'CRM / Pipeline', icon: <Users size={18} />, to: '/crm', badgeKey: 'crm', badgeColor: 'teal' },
     { label: 'New Customer Intake', icon: <UserPlus size={18} />, to: '/intake' },
   ]},
   { heading: 'Consulting', items: [
-    { label: 'Assessments', icon: <ClipboardCheck size={18} />, to: '/assessments', badge: 4, badgeColor: 'blue' },
+    { label: 'Assessments', icon: <ClipboardCheck size={18} />, to: '/assessments', badgeKey: 'assessments', badgeColor: 'blue' },
     { label: 'Workflow', icon: <GitBranch size={18} />, to: '/workflow' },
     { label: 'Templates', icon: <FileText size={18} />, to: '/templates' },
   ]},
   { heading: 'Operations', items: [
-    { label: 'Engagements', icon: <Briefcase size={18} />, to: '/operations', badge: 8, badgeColor: 'amber' },
+    { label: 'Engagements', icon: <Briefcase size={18} />, to: '/operations', badgeKey: 'operations', badgeColor: 'amber' },
     { label: 'Reports', icon: <BarChart3 size={18} />, to: '/reports' },
   ]},
   { heading: 'Admin', items: [
@@ -46,7 +51,16 @@ const badgeStyles: Record<string, string> = {
   red: 'bg-red-500/20 text-red-400',
 }
 
-// Load favorites from localStorage
+// Live badge counts from real data
+function useBadgeCounts(): Record<string, number> {
+  return useMemo(() => ({
+    crm: pipelineColumns.reduce((sum, col) => sum + col.cards.length, 0),
+    assessments: activeAssessments.length,
+    operations: operationsEngagements.length,
+  }), [])
+}
+
+// Favorites persistence
 function loadFavorites(): string[] {
   try {
     const stored = localStorage.getItem('forge-favorites')
@@ -65,14 +79,22 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { theme, toggle: toggleTheme } = useTheme()
+  const navRef = useRef<HTMLElement>(null)
+
   const [profileOpen, setProfileOpen] = useState(false)
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const [notifPanelOpen, setNotifPanelOpen] = useState(false)
+  const [tenantOpen, setTenantOpen] = useState(false)
+  const [activeTenant, setActiveTenant] = useState<Tenant>(tenants[0])
   const [notifications, setNotifications] = useState<Notification[]>(defaultNotifications)
   const [role, setRole] = useState<UserRole>('admin')
   const [favorites, setFavorites] = useState<string[]>(loadFavorites)
+  const [focusedIndex, setFocusedIndex] = useState(-1)
 
   const unreadCount = notifications.filter(n => !n.read).length
+  const badgeCounts = useBadgeCounts()
 
   // Filter nav groups based on role
   const navGroups = allNavGroups
@@ -81,6 +103,21 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       items: group.items.filter(item => roleAccess[role].includes(item.to)),
     }))
     .filter(group => group.items.length > 0)
+
+  // Flat list of all visible nav items for keyboard navigation
+  const flatNavItems = useMemo(() => {
+    const fav = allNavGroups
+      .flatMap(g => g.items)
+      .filter(item => favorites.includes(item.to) && roleAccess[role].includes(item.to))
+    const regular = navGroups.flatMap(g => g.items)
+    // Combine favorites + regular (dedup by path)
+    const seen = new Set<string>()
+    const all: NavItem[] = []
+    for (const item of [...fav, ...regular]) {
+      if (!seen.has(item.to)) { seen.add(item.to); all.push(item) }
+    }
+    return all
+  }, [navGroups, favorites, role])
 
   // Favorite items
   const favoriteItems = allNavGroups
@@ -95,6 +132,14 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     })
   }
 
+  // Breadcrumb sync: scroll active item into view on navigation
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const activeEl = navRef.current?.querySelector('[data-active="true"]')
+      activeEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    })
+  }, [location.pathname])
+
   // Global Ctrl+K / Cmd+K
   const handleGlobalKey = useCallback((e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -108,12 +153,42 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     return () => window.removeEventListener('keydown', handleGlobalKey)
   }, [handleGlobalKey])
 
+  // Keyboard navigation for sidebar
+  function handleNavKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setFocusedIndex(prev => Math.min(prev + 1, flatNavItems.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setFocusedIndex(prev => Math.max(prev - 1, 0))
+    } else if (e.key === 'Enter' && focusedIndex >= 0 && flatNavItems[focusedIndex]) {
+      e.preventDefault()
+      navigate(flatNavItems[focusedIndex].to)
+    } else if (e.key === 'Escape') {
+      setFocusedIndex(-1)
+      ;(e.target as HTMLElement).blur?.()
+    }
+  }
+
+  // Focus the correct nav link element when focusedIndex changes
+  useEffect(() => {
+    if (focusedIndex >= 0 && flatNavItems[focusedIndex]) {
+      const el = navRef.current?.querySelector(`[data-nav-path="${flatNavItems[focusedIndex].to}"]`) as HTMLElement
+      el?.focus()
+    }
+  }, [focusedIndex, flatNavItems])
+
   function handleMarkRead(id: string) {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
   }
 
   function handleMarkAllRead() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  function handleSelectTenant(tenant: Tenant) {
+    setActiveTenant(tenant)
+    setTenantOpen(false)
   }
 
   const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[260px]'
@@ -134,10 +209,77 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           )}
         </div>
 
+        {/* Tenant Switcher */}
+        {!collapsed ? (
+          <div className="px-3 pt-3 pb-0 relative">
+            <button
+              onClick={() => setTenantOpen(!tenantOpen)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/60 text-xs hover:bg-white/[0.07] hover:border-white/[0.1] transition-all"
+            >
+              <div
+                className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: activeTenant.color }}
+              >
+                {activeTenant.initials}
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <span className="block text-[11px] font-medium text-white/70 truncate">{activeTenant.name}</span>
+              </div>
+              <ChevronDown size={12} className={`text-white/30 transition-transform ${tenantOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {tenantOpen && (
+              <div className="absolute left-3 right-3 top-full mt-1 bg-[#1A2332] rounded-xl border border-white/[0.08] shadow-2xl shadow-black/40 py-1.5 z-50 animate-slideDown">
+                <p className="px-3.5 py-1.5 text-[10px] text-white/25 uppercase tracking-wider font-semibold">Workspaces</p>
+                {tenants.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => handleSelectTenant(t)}
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs hover:bg-white/[0.04] transition-colors ${
+                      activeTenant.id === t.id ? 'text-white' : 'text-white/50 hover:text-white/70'
+                    }`}
+                  >
+                    <div
+                      className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
+                      style={{ backgroundColor: t.color }}
+                    >
+                      {t.initials}
+                    </div>
+                    <div className="flex-1 text-left min-w-0">
+                      <span className="block text-[11px] font-medium truncate">{t.name}</span>
+                      <span className="block text-[10px] text-white/30">{t.industry}</span>
+                    </div>
+                    {activeTenant.id === t.id && <Check size={12} className="text-forge-teal flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex justify-center px-2 pt-3 pb-0">
+            <button
+              onClick={() => setTenantOpen(!tenantOpen)}
+              className="relative w-10 h-8 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors group/tenant"
+              title={activeTenant.name}
+            >
+              <div
+                className="w-6 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white"
+                style={{ backgroundColor: activeTenant.color }}
+              >
+                {activeTenant.initials}
+              </div>
+              {/* Tooltip */}
+              <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 rounded-lg bg-[#1A2332] border border-white/[0.08] text-xs text-white whitespace-nowrap opacity-0 group-hover/tenant:opacity-100 transition-opacity shadow-xl z-50">
+                {activeTenant.name}
+              </div>
+            </button>
+          </div>
+        )}
+
         {/* Search trigger + Quick actions */}
         {!collapsed ? (
           <>
-            <div className="px-3 pt-3 pb-1">
+            <div className="px-3 pt-2 pb-1">
               <button
                 onClick={() => setCommandPaletteOpen(true)}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/30 text-xs hover:bg-white/[0.07] hover:text-white/40 hover:border-white/[0.1] transition-all"
@@ -194,8 +336,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
         )}
 
-        {/* Navigation */}
-        <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-3'} py-2 space-y-4 overflow-y-auto`}>
+        {/* Navigation — keyboard navigable */}
+        <nav
+          ref={navRef}
+          className={`flex-1 ${collapsed ? 'px-2' : 'px-3'} py-2 space-y-4 overflow-y-auto`}
+          onKeyDown={handleNavKeyDown}
+        >
           {/* Favorites section */}
           {favoriteItems.length > 0 && (
             <div>
@@ -206,31 +352,48 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 </p>
               )}
               <ul className="space-y-0.5">
-                {favoriteItems.map((item) => (
-                  <li key={`fav-${item.to}`}>
-                    <NavLink
-                      to={item.to}
-                      className={({ isActive }) =>
-                        `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden ${
-                          isActive
-                            ? 'bg-gradient-to-r from-amber-500/15 to-amber-500/5 text-white'
-                            : 'text-white/45 hover:bg-white/[0.04] hover:text-white/70'
-                        }`
-                      }
-                      title={collapsed ? item.label : undefined}
-                    >
-                      {({ isActive }) => (
-                        <>
-                          {isActive && (
-                            <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-gradient-to-b from-amber-400 to-amber-500" />
-                          )}
-                          <span className={`flex-shrink-0 ${isActive ? 'text-amber-400' : ''}`}>{item.icon}</span>
-                          {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
-                        </>
-                      )}
-                    </NavLink>
-                  </li>
-                ))}
+                {favoriteItems.map((item) => {
+                  const badge = item.badgeKey ? badgeCounts[item.badgeKey] : undefined
+                  return (
+                    <li key={`fav-${item.to}`}>
+                      <NavLink
+                        to={item.to}
+                        data-nav-path={item.to}
+                        data-active={location.pathname === item.to ? 'true' : undefined}
+                        tabIndex={0}
+                        className={({ isActive }) =>
+                          `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden outline-none focus-visible:ring-1 focus-visible:ring-amber-400/40 ${
+                            isActive
+                              ? 'bg-gradient-to-r from-amber-500/15 to-amber-500/5 text-white'
+                              : 'text-white/45 hover:bg-white/[0.04] hover:text-white/70'
+                          }`
+                        }
+                        title={collapsed ? item.label : undefined}
+                      >
+                        {({ isActive }) => (
+                          <>
+                            {isActive && (
+                              <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-gradient-to-b from-amber-400 to-amber-500" />
+                            )}
+                            <span className={`flex-shrink-0 ${isActive ? 'text-amber-400' : ''}`}>{item.icon}</span>
+                            {!collapsed && (
+                              <>
+                                <span className="flex-1 truncate">{item.label}</span>
+                                {badge !== undefined && (
+                                  <span className={`min-w-[22px] h-[22px] flex items-center justify-center rounded-md text-[10px] font-bold ${
+                                    badgeStyles[item.badgeColor || 'teal']
+                                  }`}>
+                                    {badge}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </NavLink>
+                    </li>
+                  )
+                })}
               </ul>
               {!collapsed && <div className="my-2 mx-3 border-t border-white/[0.04]" />}
             </div>
@@ -246,73 +409,79 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 </p>
               )}
               <ul className="space-y-0.5">
-                {group.items.map((item) => (
-                  <li key={item.to} className="group/item relative">
-                    <NavLink
-                      to={item.to}
-                      className={({ isActive }) =>
-                        `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden ${
-                          isActive
-                            ? 'bg-gradient-to-r from-forge-teal/15 to-forge-teal/5 text-white shadow-sm'
-                            : 'text-white/45 hover:bg-white/[0.04] hover:text-white/70'
-                        }`
-                      }
-                      title={collapsed ? item.label : undefined}
-                    >
-                      {({ isActive }) => (
-                        <>
-                          {isActive && (
-                            <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-gradient-to-b from-forge-teal to-emerald-400 shadow-sm shadow-forge-teal/40" />
-                          )}
-                          <span className={`flex-shrink-0 transition-all duration-200 ${
-                            isActive ? 'text-forge-teal' : 'group-hover:text-white/60'
-                          }`}>
-                            {item.icon}
-                          </span>
-                          {!collapsed && (
-                            <>
-                              <span className="flex-1 truncate">{item.label}</span>
-                              {item.badge !== undefined && (
-                                <span className={`min-w-[22px] h-[22px] flex items-center justify-center rounded-md text-[10px] font-bold ${
-                                  badgeStyles[item.badgeColor || 'teal']
-                                }`}>
-                                  {item.badge}
-                                </span>
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
-                    </NavLink>
-
-                    {/* Favorite toggle — shown on hover (expanded mode only) */}
-                    {!collapsed && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(item.to) }}
-                        className={`absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded transition-all ${
-                          favorites.includes(item.to)
-                            ? 'text-amber-400 opacity-100'
-                            : 'text-white/15 opacity-0 group-hover/item:opacity-100 hover:text-amber-400'
-                        }`}
-                        title={favorites.includes(item.to) ? 'Remove from favorites' : 'Add to favorites'}
+                {group.items.map((item) => {
+                  const badge = item.badgeKey ? badgeCounts[item.badgeKey] : undefined
+                  return (
+                    <li key={item.to} className="group/item relative">
+                      <NavLink
+                        to={item.to}
+                        data-nav-path={item.to}
+                        data-active={location.pathname === item.to ? 'true' : undefined}
+                        tabIndex={0}
+                        className={({ isActive }) =>
+                          `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden outline-none focus-visible:ring-1 focus-visible:ring-forge-teal/40 ${
+                            isActive
+                              ? 'bg-gradient-to-r from-forge-teal/15 to-forge-teal/5 text-white shadow-sm'
+                              : 'text-white/45 hover:bg-white/[0.04] hover:text-white/70'
+                          }`
+                        }
+                        title={collapsed ? item.label : undefined}
                       >
-                        {favorites.includes(item.to) ? <Star size={12} className="fill-amber-400" /> : <StarOff size={12} />}
-                      </button>
-                    )}
-
-                    {/* Collapsed tooltip */}
-                    {collapsed && (
-                      <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 rounded-lg bg-[#1A2332] border border-white/[0.08] text-xs text-white whitespace-nowrap opacity-0 group-hover/item:opacity-100 transition-opacity shadow-xl z-50">
-                        {item.label}
-                        {item.badge !== undefined && (
-                          <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold ${badgeStyles[item.badgeColor || 'teal']}`}>
-                            {item.badge}
-                          </span>
+                        {({ isActive }) => (
+                          <>
+                            {isActive && (
+                              <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-gradient-to-b from-forge-teal to-emerald-400 shadow-sm shadow-forge-teal/40" />
+                            )}
+                            <span className={`flex-shrink-0 transition-all duration-200 ${
+                              isActive ? 'text-forge-teal' : 'group-hover:text-white/60'
+                            }`}>
+                              {item.icon}
+                            </span>
+                            {!collapsed && (
+                              <>
+                                <span className="flex-1 truncate">{item.label}</span>
+                                {badge !== undefined && (
+                                  <span className={`min-w-[22px] h-[22px] flex items-center justify-center rounded-md text-[10px] font-bold ${
+                                    badgeStyles[item.badgeColor || 'teal']
+                                  }`}>
+                                    {badge}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </>
                         )}
-                      </div>
-                    )}
-                  </li>
-                ))}
+                      </NavLink>
+
+                      {/* Favorite toggle — shown on hover (expanded mode only) */}
+                      {!collapsed && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleFavorite(item.to) }}
+                          className={`absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded transition-all ${
+                            favorites.includes(item.to)
+                              ? 'text-amber-400 opacity-100'
+                              : 'text-white/15 opacity-0 group-hover/item:opacity-100 hover:text-amber-400'
+                          }`}
+                          title={favorites.includes(item.to) ? 'Remove from favorites' : 'Add to favorites'}
+                        >
+                          {favorites.includes(item.to) ? <Star size={12} className="fill-amber-400" /> : <StarOff size={12} />}
+                        </button>
+                      )}
+
+                      {/* Collapsed tooltip */}
+                      {collapsed && (
+                        <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 rounded-lg bg-[#1A2332] border border-white/[0.08] text-xs text-white whitespace-nowrap opacity-0 group-hover/item:opacity-100 transition-opacity shadow-xl z-50">
+                          {item.label}
+                          {badge !== undefined && (
+                            <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold ${badgeStyles[item.badgeColor || 'teal']}`}>
+                              {badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           ))}
@@ -389,11 +558,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 Account Settings
                 <ExternalLink size={10} className="ml-auto text-white/20" />
               </button>
-              <button className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs text-white/50 hover:text-white/80 hover:bg-white/[0.04] transition-colors">
-                <Moon size={14} />
-                Dark Mode
-                <span className="ml-auto w-7 h-4 rounded-full bg-forge-teal/30 flex items-center justify-end px-0.5">
-                  <span className="w-3 h-3 rounded-full bg-forge-teal shadow-sm" />
+              <button
+                onClick={() => { toggleTheme(); setProfileOpen(false) }}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs text-white/50 hover:text-white/80 hover:bg-white/[0.04] transition-colors"
+              >
+                {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                <span className={`ml-auto w-8 h-4 rounded-full flex items-center px-0.5 transition-colors ${
+                  theme === 'dark' ? 'bg-forge-teal/30 justify-end' : 'bg-white/10 justify-start'
+                }`}>
+                  <span className={`w-3 h-3 rounded-full transition-colors ${
+                    theme === 'dark' ? 'bg-forge-teal shadow-sm' : 'bg-white/40'
+                  }`} />
                 </span>
               </button>
               <button className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs text-white/50 hover:text-white/80 hover:bg-white/[0.04] transition-colors">

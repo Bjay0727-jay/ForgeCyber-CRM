@@ -202,6 +202,23 @@ export const roleLabels: Record<UserRole, string> = {
   analyst: 'Analyst',
 }
 
+// Multi-tenant workspaces
+export interface Tenant {
+  id: string
+  name: string
+  industry: string
+  initials: string
+  color: string
+}
+
+export const tenants: Tenant[] = [
+  { id: 'forge-internal', name: 'Forge Cyber (Internal)', industry: 'MSSP', initials: 'FC', color: '#0D9488' },
+  { id: 'raytheon', name: 'Raytheon Intelligence', industry: 'Defense', initials: 'RI', color: '#2563EB' },
+  { id: 'texas-health', name: 'Texas Health Resources', industry: 'Healthcare', initials: 'TH', color: '#059669' },
+  { id: 'first-national', name: 'First National Bank', industry: 'Financial', initials: 'FN', color: '#D97706' },
+  { id: 'lockheed', name: 'Lockheed Martin', industry: 'Defense', initials: 'LM', color: '#7C3AED' },
+]
+
 export const sampleFindings = [
   { severity: 'critical' as const, title: 'Unpatched Domain Controllers', desc: 'Two domain controllers running outdated OS versions with known CVEs. NIST Control: SI-2', nist: 'SI-2' },
   { severity: 'high' as const, title: 'Weak Password Policy', desc: 'Current policy allows 8-char passwords with no complexity. NIST Control: IA-5', nist: 'IA-5' },

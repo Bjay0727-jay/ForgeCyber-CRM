@@ -9,7 +9,7 @@
   --color-forge-teal-light: #14B8A6;
   --color-forge-teal-subtle: rgba(13, 148, 136, 0.08);
 
-  /* Neutrals */
+  /* Neutrals — light mode defaults */
   --color-forge-bg: #F8F9FB;
   --color-forge-bg-hover: #F1F3F7;
   --color-forge-card: #FFFFFF;
@@ -40,6 +40,21 @@
   --font-mono: 'JetBrains Mono', 'Menlo', monospace;
 }
 
+/* Dark theme overrides */
+html.dark {
+  --color-forge-bg: #0F1219;
+  --color-forge-bg-hover: #1A1F2E;
+  --color-forge-card: #171C28;
+  --color-forge-border: #2A3040;
+  --color-forge-border-light: #1E2433;
+
+  --color-forge-text: #E8ECF1;
+  --color-forge-text-muted: #94A3B8;
+  --color-forge-text-faint: #64748B;
+
+  --color-forge-teal-subtle: rgba(13, 148, 136, 0.12);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -54,6 +69,7 @@
     min-height: 100vh;
     font-size: 14px;
     line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -94,3 +110,9 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-forge-border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-forge-text-faint); }
+
+/* Dark mode transitions for cards */
+html.dark .bg-white {
+  background-color: var(--color-forge-card) !important;
+  transition: background-color 0.3s ease;
+}
