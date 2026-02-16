@@ -11,10 +11,10 @@ import {
 import type { ReactNode } from 'react'
 import {
   notifications as defaultNotifications, roleAccess, roleLabels,
-  pipelineColumns, activeAssessments, operationsEngagements,
   tenants, integrations,
 } from '../data/mockData'
 import type { UserRole, Notification, Tenant } from '../data/mockData'
+import { getOpportunities, getAssessments, getEngagements } from '../lib/api'
 import OnboardingTour from './OnboardingTour'
 import { useTheme } from '../context/ThemeContext'
 import CommandPalette from './CommandPalette'
@@ -54,12 +54,12 @@ const badgeStyles: Record<string, string> = {
   red: 'bg-red-500/20 text-red-400',
 }
 
-// Live badge counts from real data
+// Live badge counts from API data
 function useBadgeCounts(): Record<string, number> {
   return useMemo(() => ({
-    crm: pipelineColumns.reduce((sum, col) => sum + col.cards.length, 0),
-    assessments: activeAssessments.length,
-    operations: operationsEngagements.length,
+    crm: getOpportunities().length,
+    assessments: getAssessments().filter(a => a.status !== 'completed').length,
+    operations: getEngagements().filter(e => e.status !== 'completed').length,
   }), [])
 }
 
@@ -227,6 +227,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <div data-tour="tenant" className="px-3 pt-3 pb-0 relative">
             <button
               onClick={() => setTenantOpen(!tenantOpen)}
+              aria-expanded={tenantOpen}
+              aria-haspopup="menu"
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/60 text-xs hover:bg-white/[0.07] hover:border-white/[0.1] transition-all"
             >
               <div
@@ -353,6 +355,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <nav
           ref={navRef}
           data-tour="nav"
+          aria-label="Main navigation"
           className={`flex-1 ${collapsed ? 'px-2' : 'px-3'} py-2 space-y-4 overflow-y-auto`}
           onKeyDown={handleNavKeyDown}
         >
@@ -374,6 +377,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                         to={item.to}
                         data-nav-path={item.to}
                         data-active={location.pathname === item.to ? 'true' : undefined}
+                        aria-current={location.pathname === item.to ? 'page' : undefined}
                         tabIndex={0}
                         className={({ isActive }) =>
                           `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden outline-none focus-visible:ring-1 focus-visible:ring-amber-400/40 ${
@@ -431,6 +435,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                         to={item.to}
                         data-nav-path={item.to}
                         data-active={location.pathname === item.to ? 'true' : undefined}
+                        aria-current={location.pathname === item.to ? 'page' : undefined}
                         tabIndex={0}
                         className={({ isActive }) =>
                           `group flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 relative overflow-hidden outline-none focus-visible:ring-1 focus-visible:ring-forge-teal/40 ${
@@ -505,6 +510,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <div className={`px-3 py-1.5 ${collapsed ? 'flex justify-center' : ''}`}>
           <button
             onClick={onToggle}
+            aria-expanded={!collapsed}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             className={`flex items-center ${collapsed ? 'justify-center w-10' : 'gap-2 w-full px-3'} py-2 rounded-lg text-white/25 hover:text-white/50 hover:bg-white/[0.04] transition-colors text-xs`}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
@@ -580,11 +587,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <div className="mx-3 mb-1.5 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.04]">
             <div className="flex items-center justify-between text-[10px]">
               <span className="text-white/30">
-                <span className="text-forge-teal font-semibold">{activeAssessments.length}</span> Active Assessments
+                <span className="text-forge-teal font-semibold">{badgeCounts.assessments}</span> Active Assessments
               </span>
               <span className="text-white/20">|</span>
               <span className="text-white/30">
-                <span className="text-amber-400 font-semibold">{operationsEngagements.filter(e => e.status === 'At Risk').length}</span> At Risk
+                <span className="text-amber-400 font-semibold">{getEngagements().filter(e => e.status === 'at_risk').length}</span> At Risk
               </span>
             </div>
           </div>
@@ -602,6 +609,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <div data-tour="profile" className="border-t border-white/[0.06] relative">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
+            aria-expanded={profileOpen}
+            aria-haspopup="menu"
+            aria-label="User profile menu"
             className={`w-full flex items-center gap-3 ${collapsed ? 'justify-center px-2' : 'px-4'} py-3.5 hover:bg-white/[0.03] transition-colors`}
           >
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-forge-teal/30 to-emerald-500/20 flex items-center justify-center text-forge-teal text-xs font-bold border border-forge-teal/20 flex-shrink-0">

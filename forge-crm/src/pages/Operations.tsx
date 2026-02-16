@@ -1,14 +1,9 @@
-import { operationsEngagements } from '../data/mockData'
+import { useMemo, useState } from 'react'
+import { getEngagements } from '../lib/api'
 import Card from '../components/Card'
 import Badge from '../components/Badge'
+import SearchFilterBar from '../components/SearchFilterBar'
 import { Activity, DollarSign, Clock, Users } from 'lucide-react'
-
-const summaryStats = [
-  { label: 'Total Engagements', value: '8', icon: Activity, color: 'bg-forge-teal-subtle text-forge-teal' },
-  { label: 'Total Hours', value: '485 / 700', icon: Clock, color: 'bg-forge-info/8 text-forge-info' },
-  { label: 'Revenue', value: '$393K', icon: DollarSign, color: 'bg-forge-success/8 text-forge-success' },
-  { label: 'Avg Utilization', value: '74%', icon: Users, color: 'bg-forge-warning/8 text-forge-warning' },
-]
 
 function progressColor(used: number, budget: number) {
   const pct = (used / budget) * 100
@@ -18,12 +13,71 @@ function progressColor(used: number, budget: number) {
 }
 
 function statusVariant(status: string) {
-  if (status === 'On Track') return 'success' as const
-  if (status === 'At Risk') return 'warning' as const
-  return 'danger' as const
+  switch (status) {
+    case 'on_track': return 'success' as const
+    case 'at_risk': return 'warning' as const
+    case 'blocked': return 'danger' as const
+    case 'completed': return 'success' as const
+    default: return 'info' as const
+  }
 }
 
+function statusLabel(status: string) {
+  switch (status) {
+    case 'on_track': return 'On Track'
+    case 'at_risk': return 'At Risk'
+    case 'blocked': return 'Blocked'
+    case 'completed': return 'Completed'
+    default: return status
+  }
+}
+
+function formatCurrency(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1000) return `$${Math.round(value / 1000)}K`
+  return `$${value}`
+}
+
+const engagementFilters = [
+  { key: 'all', label: 'All' },
+  { key: 'on_track', label: 'On Track' },
+  { key: 'at_risk', label: 'At Risk' },
+  { key: 'blocked', label: 'Blocked' },
+  { key: 'completed', label: 'Completed' },
+]
+
 export default function Operations() {
+  const engagements = useMemo(() => getEngagements(), [])
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  const filteredEngagements = useMemo(() => {
+    return engagements.filter((eng) => {
+      const q = search.toLowerCase()
+      const matchesSearch =
+        !q ||
+        eng.organizationName.toLowerCase().includes(q) ||
+        eng.type.toLowerCase().includes(q) ||
+        eng.consultant.toLowerCase().includes(q)
+      const matchesStatus = statusFilter === 'all' || eng.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+  }, [engagements, search, statusFilter])
+
+  const summaryStats = useMemo(() => {
+    const totalHoursUsed = engagements.reduce((s, e) => s + e.hoursUsed, 0)
+    const totalHoursBudget = engagements.reduce((s, e) => s + e.hoursBudget, 0)
+    const totalRevenue = engagements.reduce((s, e) => s + e.revenue, 0)
+    const avgUtil = totalHoursBudget > 0 ? Math.round((totalHoursUsed / totalHoursBudget) * 100) : 0
+
+    return [
+      { label: 'Total Engagements', value: String(engagements.length), icon: Activity, color: 'bg-forge-teal-subtle text-forge-teal' },
+      { label: 'Total Hours', value: `${totalHoursUsed} / ${totalHoursBudget}`, icon: Clock, color: 'bg-forge-info/8 text-forge-info' },
+      { label: 'Revenue', value: formatCurrency(totalRevenue), icon: DollarSign, color: 'bg-forge-success/8 text-forge-success' },
+      { label: 'Avg Utilization', value: `${avgUtil}%`, icon: Users, color: 'bg-forge-warning/8 text-forge-warning' },
+    ]
+  }, [engagements])
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-4 gap-4">
@@ -37,6 +91,15 @@ export default function Operations() {
           </div>
         ))}
       </div>
+
+      <SearchFilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        placeholder="Search engagements..."
+        filters={engagementFilters}
+        activeFilter={statusFilter}
+        onFilterChange={setStatusFilter}
+      />
 
       <Card
         title="Active Engagements"
@@ -59,9 +122,9 @@ export default function Operations() {
             </tr>
           </thead>
           <tbody>
-            {operationsEngagements.map((eng, i) => (
-              <tr key={i} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
-                <td className="py-3 px-4 text-sm font-medium text-forge-text">{eng.customer}</td>
+            {filteredEngagements.map((eng) => (
+              <tr key={eng.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
+                <td className="py-3 px-4 text-sm font-medium text-forge-text">{eng.organizationName}</td>
                 <td className="py-3 px-4 text-sm text-forge-text-muted">{eng.type}</td>
                 <td className="py-3 px-4 text-sm text-forge-text-muted">{eng.consultant}</td>
                 <td className="py-3 px-4">
@@ -72,8 +135,8 @@ export default function Operations() {
                     <span className="text-xs font-medium text-forge-text-muted whitespace-nowrap">{eng.hoursUsed}/{eng.hoursBudget}</span>
                   </div>
                 </td>
-                <td className="py-3 px-4"><Badge variant={statusVariant(eng.status)} dot>{eng.status}</Badge></td>
-                <td className="py-3 px-4 text-sm font-semibold text-forge-teal">{eng.revenue}</td>
+                <td className="py-3 px-4"><Badge variant={statusVariant(eng.status)} dot>{statusLabel(eng.status)}</Badge></td>
+                <td className="py-3 px-4 text-sm font-semibold text-forge-teal">{formatCurrency(eng.revenue)}</td>
               </tr>
             ))}
           </tbody>

@@ -33,8 +33,11 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-forge-bg">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[999] focus:px-4 focus:py-2 focus:bg-forge-teal focus:text-white focus:rounded-lg focus:text-sm focus:font-medium">
+        Skip to main content
+      </a>
       <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(prev => !prev)} />
-      <main className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]'}`}>
+      <main id="main-content" className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]'}`}>
         <TopBar title={page.title} breadcrumb={page.breadcrumb} />
         <div className="p-6" key={location.pathname}>
           <Routes>
