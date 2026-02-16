@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  /* Primary palette */
+  --color-forge-navy: #111827;
+  --color-forge-navy-deep: #0B1226;
+  --color-forge-navy-light: #1E293B;
+  --color-forge-teal: #0D9488;
+  --color-forge-teal-light: #14B8A6;
+  --color-forge-teal-subtle: rgba(13, 148, 136, 0.08);
+
+  /* Neutrals — light mode defaults */
+  --color-forge-bg: #F8F9FB;
+  --color-forge-bg-hover: #F1F3F7;
+  --color-forge-card: #FFFFFF;
+  --color-forge-border: #E5E7EB;
+  --color-forge-border-light: #F0F1F3;
+
+  /* Text */
+  --color-forge-text: #111827;
+  --color-forge-text-muted: #6B7280;
+  --color-forge-text-faint: #9CA3AF;
+
+  /* Semantic */
+  --color-forge-success: #059669;
+  --color-forge-warning: #D97706;
+  --color-forge-danger: #DC2626;
+  --color-forge-info: #2563EB;
+  --color-forge-purple: #7C3AED;
+  --color-forge-cyan: #0891B2;
+
+  /* Sidebar */
+  --color-forge-sidebar: #0F172A;
+  --color-forge-sidebar-hover: rgba(255, 255, 255, 0.06);
+  --color-forge-sidebar-active: rgba(13, 148, 136, 0.12);
+
+  /* Typography */
+  --font-heading: 'Inter', 'system-ui', sans-serif;
+  --font-body: 'Inter', 'system-ui', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+}
+
+/* Dark theme overrides */
+html.dark {
+  --color-forge-bg: #0F1219;
+  --color-forge-bg-hover: #1A1F2E;
+  --color-forge-card: #171C28;
+  --color-forge-border: #2A3040;
+  --color-forge-border-light: #1E2433;
+
+  --color-forge-text: #E8ECF1;
+  --color-forge-text-muted: #94A3B8;
+  --color-forge-text-faint: #64748B;
+
+  --color-forge-teal-subtle: rgba(13, 148, 136, 0.12);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-forge-bg);
+    color: var(--color-forge-text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.2s ease-out; }
+.animate-scaleIn { animation: scaleIn 0.2s ease-out; }
+.animate-slideDown { animation: slideDown 0.15s ease-out; }
+
+/* Toast */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+.toast-enter { animation: toastIn 0.25s ease-out; }
+.toast-exit { animation: toastOut 0.25s ease-in; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-forge-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-forge-text-faint); }
+
+/* Dark mode transitions for cards */
+html.dark .bg-white {
+  background-color: var(--color-forge-card) !important;
+  transition: background-color 0.3s ease;
+}
