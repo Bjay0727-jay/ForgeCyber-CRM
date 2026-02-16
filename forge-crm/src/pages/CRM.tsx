@@ -495,11 +495,11 @@ export default function CRM() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-forge-border">
-                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Organization</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Stage</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-forge-text-muted">Value</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Description</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Last Updated</th>
+                  <th scope="col" className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Organization</th>
+                  <th scope="col" className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Stage</th>
+                  <th scope="col" className="text-right py-2.5 px-3 font-medium text-forge-text-muted">Value</th>
+                  <th scope="col" className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Description</th>
+                  <th scope="col" className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Last Updated</th>
                 </tr>
               </thead>
               <tbody>

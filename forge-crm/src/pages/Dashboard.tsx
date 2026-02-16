@@ -140,11 +140,11 @@ export default function Dashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-forge-border bg-forge-bg/50">
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Customer</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Type</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Status</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Consultant</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Due</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Customer</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Type</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Status</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Consultant</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-5">Due</th>
               </tr>
             </thead>
             <tbody>
