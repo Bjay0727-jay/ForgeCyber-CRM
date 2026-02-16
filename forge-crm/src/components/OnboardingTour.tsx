@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
 import { X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
 
 interface TourStep {
@@ -60,29 +60,25 @@ interface OnboardingTourProps {
 
 export default function OnboardingTour({ active, onFinish }: OnboardingTourProps) {
   const [step, setStep] = useState(0)
-  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 })
+  const tooltipRef = useRef<HTMLDivElement>(null)
 
   const positionTooltip = useCallback(() => {
-    if (!active) return
+    if (!active || !tooltipRef.current) return
     const current = tourSteps[step]
     const el = document.querySelector(current.target)
     if (!el) return
 
     const rect = el.getBoundingClientRect()
     if (current.position === 'right') {
-      setTooltipPos({
-        top: rect.top + rect.height / 2 - 60,
-        left: rect.right + 16,
-      })
+      tooltipRef.current.style.top = `${rect.top + rect.height / 2 - 60}px`
+      tooltipRef.current.style.left = `${rect.right + 16}px`
     } else {
-      setTooltipPos({
-        top: rect.bottom + 12,
-        left: rect.left,
-      })
+      tooltipRef.current.style.top = `${rect.bottom + 12}px`
+      tooltipRef.current.style.left = `${rect.left}px`
     }
   }, [active, step])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!active) return
     positionTooltip()
     window.addEventListener('resize', positionTooltip)
@@ -118,8 +114,8 @@ export default function OnboardingTour({ active, onFinish }: OnboardingTourProps
 
       {/* Tooltip */}
       <div
+        ref={tooltipRef}
         className="fixed z-[302] w-[320px] bg-white rounded-xl shadow-2xl border border-forge-border overflow-hidden animate-scaleIn"
-        style={{ top: tooltipPos.top, left: tooltipPos.left }}
       >
         {/* Progress bar */}
         <div className="h-1 bg-forge-bg">

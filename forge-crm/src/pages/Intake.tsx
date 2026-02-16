@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Save, ArrowRight, Loader2, CheckCircle } from 'lucide-react'
 import Card from '../components/Card'
+import { createOrganization } from '../lib/api'
+import type { IntakeFormData as IntakePayload } from '../types'
 
 const industrySectors = ['Defense / DOD', 'Federal Government', 'Healthcare', 'Financial Services', 'State & Local Government', 'Critical Infrastructure', 'Other']
 const complianceFrameworks = ['CMMC 2.0', 'NIST 800-53', 'NIST 800-171', 'FedRAMP', 'HIPAA', 'PCI-DSS', 'SOX', 'SOC 2']
@@ -71,9 +73,19 @@ export default function Intake() {
     },
   })
 
-  const onSubmit = async (_data: unknown) => {
+  const onSubmit = async (data: IntakeFormData) => {
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    createOrganization({
+      organization: { name: data.organization.name, sector: data.organization.sector, address: data.organization.address ?? '', cityStateZip: data.organization.cityStateZip ?? '', website: data.organization.website ?? '', employeeCount: data.organization.employeeCount ?? '' },
+      contact: { name: data.contact.name, title: data.contact.title ?? '', email: data.contact.email, phone: data.contact.phone ?? '', preferredContact: data.contact.preferredContact },
+      compliance: data.compliance ?? [],
+      securityTools: data.securityTools ?? '',
+      securityChallenges: data.securityChallenges ?? '',
+      services: data.services ?? [],
+      timeline: data.timeline ?? '',
+      budget: data.budget ?? '',
+      notes: data.notes ?? '',
+    } satisfies IntakePayload)
     setIsSubmitting(false)
     setShowSuccess(true)
     setTimeout(() => { setShowSuccess(false); reset() }, 2000)

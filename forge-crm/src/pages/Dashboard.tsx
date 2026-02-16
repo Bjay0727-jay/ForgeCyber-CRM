@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Users,
@@ -12,7 +13,8 @@ import {
   ArrowDownRight,
   ChevronRight,
 } from 'lucide-react'
-import { dashboardStats, engagements, activities } from '../data/mockData'
+import { getOrganizations, getAssessments, getOpportunities, getEngagements } from '../lib/api'
+import { activities } from '../data/mockData'
 import Badge from '../components/Badge'
 import Card from '../components/Card'
 
@@ -44,14 +46,50 @@ const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = 
   alert: { icon: <AlertTriangle size={16} />, color: 'text-forge-danger bg-forge-danger/8' },
 }
 
+function formatCurrency(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1000) return `$${Math.round(value / 1000)}K`
+  return `$${value}`
+}
+
+function engagementDisplay(status: string): { label: string; variant: 'success' | 'warning' | 'danger' | 'info' } {
+  switch (status) {
+    case 'on_track': return { label: 'On Track', variant: 'success' }
+    case 'at_risk': return { label: 'At Risk', variant: 'warning' }
+    case 'blocked': return { label: 'Blocked', variant: 'danger' }
+    case 'completed': return { label: 'Completed', variant: 'success' }
+    default: return { label: status, variant: 'info' }
+  }
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
+
+  const stats = useMemo(() => {
+    const orgs = getOrganizations()
+    const assessments = getAssessments()
+    const opportunities = getOpportunities()
+    const inProgress = assessments.filter(a => a.status === 'in_progress')
+    const pending = assessments.filter(a => a.status === 'pending')
+    const pipelineValue = opportunities.reduce((sum, o) => sum + o.value, 0)
+
+    return [
+      { label: 'Active Customers', value: String(orgs.length), change: `${orgs.length} organizations`, positive: true, icon: 'users', link: '/crm' },
+      { label: 'Assessments In Progress', value: String(inProgress.length), change: `${pending.length} pending`, positive: null as boolean | null, icon: 'clipboard-check', link: '/assessments' },
+      { label: 'Reports Pending', value: String(pending.length + inProgress.length), change: `${inProgress.length} in progress`, positive: false, icon: 'file-text', link: '/reports' },
+      { label: 'Pipeline Value', value: formatCurrency(pipelineValue), change: `${opportunities.length} opportunities`, positive: true, icon: 'dollar-sign', link: '/crm' },
+    ]
+  }, [])
+
+  const engagementRows = useMemo(() => {
+    return getEngagements().filter(e => e.status !== 'completed').slice(0, 5)
+  }, [])
 
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
-        {dashboardStats.map((stat) => (
+        {stats.map((stat) => (
           <button
             key={stat.label}
             onClick={() => stat.link && navigate(stat.link)}
@@ -110,15 +148,18 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {engagements.map((eng) => (
-                <tr key={eng.customer} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors cursor-pointer">
-                  <td className="py-3 px-5 text-sm font-medium text-forge-text">{eng.customer}</td>
-                  <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.type}</td>
-                  <td className="py-3 px-5"><Badge variant={eng.statusType} dot>{eng.status}</Badge></td>
-                  <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.consultant}</td>
-                  <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.dueDate}</td>
-                </tr>
-              ))}
+              {engagementRows.map((eng) => {
+                const display = engagementDisplay(eng.status)
+                return (
+                  <tr key={eng.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors cursor-pointer">
+                    <td className="py-3 px-5 text-sm font-medium text-forge-text">{eng.organizationName}</td>
+                    <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.type}</td>
+                    <td className="py-3 px-5"><Badge variant={display.variant} dot>{display.label}</Badge></td>
+                    <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.consultant}</td>
+                    <td className="py-3 px-5 text-sm text-forge-text-muted">{eng.dueDate || '—'}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </Card>

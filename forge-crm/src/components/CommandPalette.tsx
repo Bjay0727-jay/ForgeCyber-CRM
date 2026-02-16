@@ -5,7 +5,8 @@ import {
   GitBranch, FileText, Briefcase, BarChart3, UsersRound,
   Settings, ArrowRight, Hash, Building2, FileCheck,
 } from 'lucide-react'
-import { customers, templates, activeAssessments } from '../data/mockData'
+import { getOrganizations, getAssessments } from '../lib/api'
+import { templates } from '../data/mockData'
 
 interface CommandItem {
   id: string
@@ -57,10 +58,10 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
       { id: 'p-settings', label: 'Settings', icon: <Settings size={16} />, category: 'page', action: () => navigate('/settings') },
     ]
 
-    const customerItems: CommandItem[] = customers.map(c => ({
-      id: `c-${c.name}`,
+    const customerItems: CommandItem[] = getOrganizations().map(c => ({
+      id: `c-${c.id}`,
       label: c.name,
-      secondaryLabel: c.detail.split(' \u2022 ')[0],
+      secondaryLabel: c.sector,
       icon: <Building2 size={16} />,
       category: 'customer',
       action: () => navigate('/crm'),
@@ -75,9 +76,9 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
       action: () => navigate('/templates'),
     }))
 
-    const assessmentItems: CommandItem[] = activeAssessments.map(a => ({
-      id: `a-${a.customer}`,
-      label: `${a.type} — ${a.customer}`,
+    const assessmentItems: CommandItem[] = getAssessments().map(a => ({
+      id: `a-${a.id}`,
+      label: `${a.type} — ${a.organizationName}`,
       secondaryLabel: `${a.progress}% complete`,
       icon: <Hash size={16} />,
       category: 'assessment',
@@ -147,18 +148,25 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
   let itemIndex = 0
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[15vh]" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[15vh]" onClick={onClose} role="presentation">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
         className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-forge-border overflow-hidden animate-scaleIn"
         onClick={e => e.stopPropagation()}
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-forge-border">
-          <Search size={18} className="text-forge-text-faint flex-shrink-0" />
+          <Search size={18} className="text-forge-text-faint flex-shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
+            role="combobox"
+            aria-expanded={flatItems.length > 0}
+            aria-controls="command-results"
+            aria-activedescendant={flatItems[selectedIndex] ? `cmd-item-${selectedIndex}` : undefined}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -171,7 +179,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[360px] overflow-y-auto py-2">
+        <div ref={listRef} id="command-results" role="listbox" className="max-h-[360px] overflow-y-auto py-2">
           {flatItems.length === 0 ? (
             <div className="px-5 py-8 text-center">
               <Search size={28} className="mx-auto text-forge-text-faint mb-2" />
@@ -189,6 +197,9 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   return (
                     <button
                       key={item.id}
+                      id={`cmd-item-${idx}`}
+                      role="option"
+                      aria-selected={isSelected}
                       data-index={idx}
                       onClick={() => { item.action(); onClose() }}
                       onMouseEnter={() => setSelectedIndex(idx)}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Plus, Filter, GripVertical } from 'lucide-react'
 import {
   DndContext,
@@ -17,9 +17,12 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { pipelineColumns as initialPipelineColumns, customers } from '../data/mockData'
+import { getOpportunities, getOrganizations, updateOpportunityStage } from '../lib/api'
+import type { Opportunity } from '../types'
 import Badge from '../components/Badge'
 import Card from '../components/Card'
+
+// ─── Shared Types ────────────────────────────────────────────────────────────
 
 interface PipelineCard {
   id: string
@@ -37,6 +40,35 @@ interface PipelineColumn {
 
 type Tab = 'pipeline' | 'customers' | 'opportunities'
 
+type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'teal' | 'navy'
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const STAGE_DISPLAY: Record<string, string> = {
+  lead: 'Lead',
+  assessment: 'Assessment',
+  proposal: 'Proposal',
+  negotiation: 'Negotiation',
+  closed_won: 'Closed Won',
+  closed_lost: 'Closed Lost',
+}
+
+const COLUMN_ORDER: Opportunity['stage'][] = [
+  'lead',
+  'assessment',
+  'proposal',
+  'negotiation',
+  'closed_won',
+]
+
+const COLUMN_COLOR: Record<string, string> = {
+  lead: 'border-forge-info',
+  assessment: 'border-forge-warning',
+  proposal: 'border-forge-teal',
+  negotiation: 'border-forge-purple',
+  closed_won: 'border-forge-success',
+}
+
 const columnAccent: Record<string, string> = {
   Lead: 'bg-forge-info',
   Assessment: 'bg-forge-warning',
@@ -45,17 +77,67 @@ const columnAccent: Record<string, string> = {
   'Closed Won': 'bg-forge-success',
 }
 
+const STAGE_BADGE_VARIANT: Record<string, BadgeVariant> = {
+  lead: 'info',
+  assessment: 'warning',
+  proposal: 'teal',
+  negotiation: 'navy',
+  closed_won: 'success',
+  closed_lost: 'danger',
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatCurrency(value: number): string {
+  if (value >= 1_000_000) {
+    const m = value / 1_000_000
+    return `$${Number.isInteger(m) ? m : m.toFixed(1)}M`
+  }
+  if (value >= 1_000) {
+    const k = value / 1_000
+    return `$${Number.isInteger(k) ? k : Math.round(k)}K`
+  }
+  return `$${value}`
+}
+
+function formatDate(iso: string): string {
+  if (!iso) return ''
+  const date = new Date(iso)
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 function buildInitialColumns(): PipelineColumn[] {
-  return initialPipelineColumns.map((col) => ({
-    id: col.title.toLowerCase().replace(/\s+/g, '-'),
-    title: col.title,
-    colorClass: col.colorClass,
-    cards: col.cards.map((card) => ({
-      ...card,
-      id: card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+  const opportunities = getOpportunities()
+  const grouped: Record<string, Opportunity[]> = {}
+
+  for (const stage of COLUMN_ORDER) {
+    grouped[stage] = []
+  }
+
+  for (const opp of opportunities) {
+    if (grouped[opp.stage]) {
+      grouped[opp.stage].push(opp)
+    }
+  }
+
+  return COLUMN_ORDER.map((stage) => ({
+    id: stage,
+    title: STAGE_DISPLAY[stage],
+    colorClass: COLUMN_COLOR[stage],
+    cards: (grouped[stage] ?? []).map((opp) => ({
+      id: opp.id,
+      name: opp.organizationName,
+      meta: [opp.sector, opp.description].filter(Boolean).join(' \u2022 '),
+      value: formatCurrency(opp.value),
     })),
   }))
 }
+
+// ─── Sortable Card ───────────────────────────────────────────────────────────
 
 interface SortableCardProps {
   card: PipelineCard
@@ -101,6 +183,8 @@ function SortableCard({ card, isDragOverlay }: SortableCardProps) {
   )
 }
 
+// ─── Droppable Column ────────────────────────────────────────────────────────
+
 interface DroppableColumnProps {
   column: PipelineColumn
   isOverColumn: boolean
@@ -138,6 +222,8 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
   )
 }
 
+// ─── Main Component ──────────────────────────────────────────────────────────
+
 export default function CRM() {
   const [activeTab, setActiveTab] = useState<Tab>('pipeline')
   const [sectorFilter, setSectorFilter] = useState('all')
@@ -155,12 +241,42 @@ export default function CRM() {
     { key: 'opportunities', label: 'Opportunities' },
   ]
 
+  // ─── Customers data derived from API ─────────────────────────────────────
+
+  const organizations = useMemo(() => getOrganizations(), [])
+  const allOpportunities = useMemo(() => getOpportunities(), [])
+
+  const customerRows = useMemo(() => {
+    return organizations.map((org) => {
+      const orgOpps = allOpportunities.filter((o) => o.organizationId === org.id)
+      const primaryOpp = orgOpps[0]
+      const stage = primaryOpp?.stage ?? 'lead'
+
+      return {
+        id: org.id,
+        initials: org.name.slice(0, 2).toUpperCase(),
+        name: org.name,
+        detail: [org.sector, org.cityStateZip].filter(Boolean).join(' \u2022 '),
+        stage: STAGE_DISPLAY[stage] ?? 'Lead',
+        stageType: STAGE_BADGE_VARIANT[stage] ?? ('info' as BadgeVariant),
+        lastContact: formatDate(org.createdAt),
+      }
+    })
+  }, [organizations, allOpportunities])
+
+  const sectors = useMemo(() => {
+    const unique = new Set(organizations.map((o) => o.sector).filter(Boolean))
+    return Array.from(unique).sort()
+  }, [organizations])
+
   const filteredCustomers =
     sectorFilter === 'all'
-      ? customers
-      : customers.filter((c) =>
+      ? customerRows
+      : customerRows.filter((c) =>
           c.detail.toLowerCase().includes(sectorFilter.toLowerCase())
         )
+
+  // ─── DnD helpers ─────────────────────────────────────────────────────────
 
   function findColumnByCardId(cardId: string): PipelineColumn | undefined {
     return columns.find((col) => col.cards.some((c) => c.id === cardId))
@@ -240,6 +356,11 @@ export default function CRM() {
     }
     if (!destColumn) return
 
+    // Persist stage change via API
+    if (sourceColumn.id !== destColumn.id) {
+      updateOpportunityStage(activeId, destColumn.id as Opportunity['stage'])
+    }
+
     if (sourceColumn.id === destColumn.id && !isColumnId(overId)) {
       const oldIndex = sourceColumn.cards.findIndex((c) => c.id === activeId)
       const newIndex = sourceColumn.cards.findIndex((c) => c.id === overId)
@@ -253,6 +374,22 @@ export default function CRM() {
       }
     }
   }
+
+  // ─── Opportunities table data ────────────────────────────────────────────
+
+  const opportunityRows = useMemo(() => {
+    return getOpportunities().map((opp) => ({
+      id: opp.id,
+      organization: opp.organizationName,
+      stage: STAGE_DISPLAY[opp.stage] ?? opp.stage,
+      stageBadge: STAGE_BADGE_VARIANT[opp.stage] ?? ('info' as BadgeVariant),
+      value: formatCurrency(opp.value),
+      description: opp.description,
+      lastUpdated: formatDate(opp.updatedAt),
+    }))
+  }, [])
+
+  // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-5">
@@ -316,9 +453,11 @@ export default function CRM() {
                   className="pl-8 pr-3 py-1.5 rounded-lg border border-forge-border text-sm text-forge-text bg-white focus:outline-none focus:border-forge-teal appearance-none cursor-pointer"
                 >
                   <option value="all">All Sectors</option>
-                  <option value="defense">Defense</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="financial">Financial</option>
+                  {sectors.map((sector) => (
+                    <option key={sector} value={sector}>
+                      {sector}
+                    </option>
+                  ))}
                 </select>
               </div>
               <button className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors">
@@ -331,7 +470,7 @@ export default function CRM() {
           <div className="space-y-2">
             {filteredCustomers.map((customer) => (
               <div
-                key={customer.name}
+                key={customer.id}
                 className="flex items-center gap-4 p-3.5 rounded-lg border border-forge-border hover:bg-forge-bg/50 hover:border-forge-teal/20 transition-all cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-forge-navy flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
@@ -349,17 +488,37 @@ export default function CRM() {
         </Card>
       )}
 
-      {/* Opportunities */}
+      {/* Opportunities Table */}
       {activeTab === 'opportunities' && (
-        <Card>
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-12 h-12 rounded-lg bg-forge-teal-subtle flex items-center justify-center mb-4">
-              <Filter size={22} className="text-forge-teal" />
-            </div>
-            <h3 className="text-base font-semibold text-forge-text mb-1">Opportunities Coming Soon</h3>
-            <p className="text-sm text-forge-text-muted max-w-md">
-              Track and manage sales opportunities with pipeline analytics, win/loss tracking, and forecasting.
-            </p>
+        <Card title="All Opportunities">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-forge-border">
+                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Organization</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Stage</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-forge-text-muted">Value</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Description</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-forge-text-muted">Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {opportunityRows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-forge-border/50 hover:bg-forge-bg/50 transition-colors"
+                  >
+                    <td className="py-2.5 px-3 font-medium text-forge-text">{row.organization}</td>
+                    <td className="py-2.5 px-3">
+                      <Badge variant={row.stageBadge}>{row.stage}</Badge>
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-semibold text-forge-teal">{row.value}</td>
+                    <td className="py-2.5 px-3 text-forge-text-muted truncate max-w-[260px]">{row.description}</td>
+                    <td className="py-2.5 px-3 text-forge-text-faint whitespace-nowrap">{row.lastUpdated}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </Card>
       )}

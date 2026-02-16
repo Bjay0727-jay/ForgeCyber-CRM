@@ -1,5 +1,7 @@
-import { teamMembers } from '../data/mockData'
+import { useMemo, useState } from 'react'
+import { getTeamMembers } from '../lib/api'
 import Badge from '../components/Badge'
+import SearchFilterBar from '../components/SearchFilterBar'
 import { Plus } from 'lucide-react'
 
 function utilizationColor(pct: number) {
@@ -8,7 +10,31 @@ function utilizationColor(pct: number) {
   return 'bg-forge-teal'
 }
 
+const teamFilters = [
+  { key: 'all', label: 'All' },
+  { key: 'available', label: 'Available' },
+  { key: 'busy', label: 'Busy' },
+  { key: 'out', label: 'Out' },
+]
+
 export default function Team() {
+  const teamMembers = useMemo(() => getTeamMembers(), [])
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  const filteredMembers = useMemo(() => {
+    return teamMembers.filter((member) => {
+      const q = search.toLowerCase()
+      const matchesSearch =
+        !q ||
+        member.name.toLowerCase().includes(q) ||
+        member.role.toLowerCase().includes(q) ||
+        member.specializations.some((s) => s.toLowerCase().includes(q))
+      const matchesStatus = statusFilter === 'all' || member.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+  }, [teamMembers, search, statusFilter])
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -19,8 +45,17 @@ export default function Team() {
         </button>
       </div>
 
+      <SearchFilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        placeholder="Search members..."
+        filters={teamFilters}
+        activeFilter={statusFilter}
+        onFilterChange={setStatusFilter}
+      />
+
       <div className="grid grid-cols-2 gap-4">
-        {teamMembers.map((member) => (
+        {filteredMembers.map((member) => (
           <div key={member.name} className="bg-white rounded-xl border border-forge-border shadow-sm p-5">
             <div className="flex items-start gap-3.5 mb-4">
               <div className="w-10 h-10 rounded-lg bg-forge-navy flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">

@@ -111,6 +111,26 @@ html.dark {
 ::-webkit-scrollbar-thumb { background: var(--color-forge-border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-forge-text-faint); }
 
+/* Accessibility: focus-visible styles */
+*:focus-visible {
+  outline: 2px solid var(--color-forge-teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Dark mode transitions for cards */
 html.dark .bg-white {
   background-color: var(--color-forge-card) !important;
