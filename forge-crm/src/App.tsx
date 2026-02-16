@@ -1,17 +1,18 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
-import Dashboard from './pages/Dashboard'
-import CRM from './pages/CRM'
-import Intake from './pages/Intake'
-import Assessments from './pages/Assessments'
-import Workflow from './pages/Workflow'
-import Templates from './pages/Templates'
-import Operations from './pages/Operations'
-import Reports from './pages/Reports'
-import Team from './pages/Team'
-import AuditLog from './pages/AuditLog'
+
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const CRM = lazy(() => import('./pages/CRM'))
+const Intake = lazy(() => import('./pages/Intake'))
+const Assessments = lazy(() => import('./pages/Assessments'))
+const Workflow = lazy(() => import('./pages/Workflow'))
+const Templates = lazy(() => import('./pages/Templates'))
+const Operations = lazy(() => import('./pages/Operations'))
+const Reports = lazy(() => import('./pages/Reports'))
+const Team = lazy(() => import('./pages/Team'))
+const AuditLog = lazy(() => import('./pages/AuditLog'))
 
 const pages: Record<string, { title: string; breadcrumb: string }> = {
   '/dashboard': { title: 'Service Delivery Dashboard', breadcrumb: 'Home / Dashboard' },
@@ -24,6 +25,14 @@ const pages: Record<string, { title: string; breadcrumb: string }> = {
   '/reports': { title: 'Reports & Analytics', breadcrumb: 'Home / Reports' },
   '/team': { title: 'Team Management', breadcrumb: 'Home / Admin / Team' },
   '/audit-log': { title: 'Audit Log', breadcrumb: 'Home / Admin / Audit Log' },
+}
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div className="w-8 h-8 border-2 border-forge-teal/30 border-t-forge-teal rounded-full animate-spin" />
+    </div>
+  )
 }
 
 export default function App() {
@@ -40,19 +49,21 @@ export default function App() {
       <main id="main-content" className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]'}`}>
         <TopBar title={page.title} breadcrumb={page.breadcrumb} />
         <div className="p-6" key={location.pathname}>
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/crm" element={<CRM />} />
-            <Route path="/intake" element={<Intake />} />
-            <Route path="/assessments" element={<Assessments />} />
-            <Route path="/workflow" element={<Workflow />} />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/operations" element={<Operations />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/team" element={<Team />} />
-            <Route path="/audit-log" element={<AuditLog />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/crm" element={<CRM />} />
+              <Route path="/intake" element={<Intake />} />
+              <Route path="/assessments" element={<Assessments />} />
+              <Route path="/workflow" element={<Workflow />} />
+              <Route path="/templates" element={<Templates />} />
+              <Route path="/operations" element={<Operations />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/audit-log" element={<AuditLog />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
     </div>
