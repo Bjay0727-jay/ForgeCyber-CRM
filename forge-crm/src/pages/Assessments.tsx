@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Play, Plus, Calendar, User, FileText, CheckCircle } from 'lucide-react'
 import { securityDomains } from '../data/mockData'
 import {
@@ -67,17 +67,20 @@ export default function Assessments() {
   const [formStartDate, setFormStartDate] = useState('')
   const [formSuccess, setFormSuccess] = useState(false)
 
-  // Refresh key to force re-read from API after mutations
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [allAssessments, setAllAssessments] = useState(() => getAssessments())
+  const [organizations, setOrganizations] = useState(() => getOrganizations())
 
-  const allAssessments = useMemo(() => getAssessments(), [refreshKey])
+  const refresh = useCallback(() => {
+    setAllAssessments(getAssessments())
+    setOrganizations(getOrganizations())
+  }, [])
+
   const activeAssessments = useMemo(() => allAssessments.filter((a) => a.status !== 'completed'), [allAssessments])
   const completedAssessments = useMemo(() => allAssessments.filter((a) => a.status === 'completed'), [allAssessments])
-  const organizations = useMemo(() => getOrganizations(), [refreshKey])
 
   const selectedAssessment = useMemo(
-    () => (selectedAssessmentId ? getAssessment(selectedAssessmentId) : undefined),
-    [selectedAssessmentId, refreshKey]
+    () => (selectedAssessmentId ? allAssessments.find((a) => a.id === selectedAssessmentId) : undefined),
+    [selectedAssessmentId, allAssessments]
   )
 
   const selectedOrg = useMemo(
@@ -114,7 +117,7 @@ export default function Assessments() {
   const handleSaveProgress = () => {
     if (selectedAssessmentId) {
       updateAssessmentRatings(selectedAssessmentId, ratings)
-      setRefreshKey((k) => k + 1)
+      refresh()
     }
     setModalOpen(false)
   }
@@ -136,7 +139,7 @@ export default function Assessments() {
     setFormConsultant('')
     setFormStartDate('')
     setFormSuccess(true)
-    setRefreshKey((k) => k + 1)
+    refresh()
 
     // Switch to active tab after a brief delay so user sees the success message
     setTimeout(() => {
