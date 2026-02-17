@@ -1,25 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary palette */
-  --color-forge-navy: #111827;
-  --color-forge-navy-deep: #0B1226;
-  --color-forge-navy-light: #1E293B;
+  /* Primary palette — derived from Forge Cyber Defense logo */
+  --color-forge-navy: #0F2A4A;
+  --color-forge-navy-deep: #081929;
+  --color-forge-navy-light: #1A3A5C;
   --color-forge-teal: #0D9488;
   --color-forge-teal-light: #14B8A6;
   --color-forge-teal-subtle: rgba(13, 148, 136, 0.08);
 
+  /* Steel/Silver — from logo shield border */
+  --color-forge-steel: #8E99A4;
+  --color-forge-steel-light: #B8C4CE;
+
   /* Neutrals — light mode defaults */
-  --color-forge-bg: #F8F9FB;
-  --color-forge-bg-hover: #F1F3F7;
+  --color-forge-bg: #F0F4F8;
+  --color-forge-bg-hover: #E8EDF2;
   --color-forge-card: #FFFFFF;
-  --color-forge-border: #E5E7EB;
-  --color-forge-border-light: #F0F1F3;
+  --color-forge-border: #D5DCE4;
+  --color-forge-border-light: #E8ECF0;
 
   /* Text */
-  --color-forge-text: #111827;
-  --color-forge-text-muted: #6B7280;
-  --color-forge-text-faint: #9CA3AF;
+  --color-forge-text: #0F2A4A;
+  --color-forge-text-muted: #5A6B7D;
+  --color-forge-text-faint: #8E99A4;
 
   /* Semantic */
   --color-forge-success: #059669;
@@ -30,29 +34,29 @@
   --color-forge-cyan: #0891B2;
 
   /* Sidebar */
-  --color-forge-sidebar: #0F172A;
+  --color-forge-sidebar: #0C1B2E;
   --color-forge-sidebar-hover: rgba(255, 255, 255, 0.06);
-  --color-forge-sidebar-active: rgba(13, 148, 136, 0.12);
+  --color-forge-sidebar-active: rgba(13, 148, 136, 0.15);
 
-  /* Typography */
-  --font-heading: 'Inter', 'system-ui', sans-serif;
-  --font-body: 'Inter', 'system-ui', sans-serif;
+  /* Typography — Montserrat for headings, Open Sans for body (matching logo/original design) */
+  --font-heading: 'Montserrat', 'system-ui', sans-serif;
+  --font-body: 'Open Sans', 'system-ui', sans-serif;
   --font-mono: 'JetBrains Mono', 'Menlo', monospace;
 }
 
 /* Dark theme overrides */
 html.dark {
-  --color-forge-bg: #0F1219;
-  --color-forge-bg-hover: #1A1F2E;
-  --color-forge-card: #171C28;
-  --color-forge-border: #2A3040;
-  --color-forge-border-light: #1E2433;
+  --color-forge-bg: #081420;
+  --color-forge-bg-hover: #0E1E30;
+  --color-forge-card: #0C1B2E;
+  --color-forge-border: #1A3050;
+  --color-forge-border-light: #122240;
 
   --color-forge-text: #E8ECF1;
-  --color-forge-text-muted: #94A3B8;
-  --color-forge-text-faint: #64748B;
+  --color-forge-text-muted: #8E99A4;
+  --color-forge-text-faint: #5A6B7D;
 
-  --color-forge-teal-subtle: rgba(13, 148, 136, 0.12);
+  --color-forge-teal-subtle: rgba(13, 148, 136, 0.15);
 }
 
 @layer base {
