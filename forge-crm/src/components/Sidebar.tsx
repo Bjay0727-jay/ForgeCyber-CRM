@@ -2,16 +2,15 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, UserPlus, ClipboardCheck, GitBranch,
-  FileText, Briefcase, BarChart3, UsersRound, Settings, Shield,
+  FileText, Briefcase, BarChart3, UsersRound, Settings,
   Search, Bell, ChevronDown, LogOut, HelpCircle, Moon, Sun,
   Zap, ExternalLink, PanelLeftClose, PanelLeftOpen,
-  Star, StarOff, Check, ScrollText, Compass, Wifi, WifiOff,
-  AlertTriangle,
+  Star, StarOff, Check, ScrollText, Compass,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import {
   notifications as defaultNotifications, roleAccess, roleLabels,
-  tenants, integrations,
+  tenants,
 } from '../data/mockData'
 import type { UserRole, Notification, Tenant } from '../data/mockData'
 import { getOpportunities, getAssessments, getEngagements } from '../lib/api'
@@ -99,15 +98,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   const unreadCount = notifications.filter(n => !n.read).length
   const badgeCounts = useBadgeCounts()
-
-  // Integration health summary
-  const integrationHealth = useMemo(() => {
-    const connected = integrations.filter(i => i.status === 'connected').length
-    const degraded = integrations.filter(i => i.status === 'degraded').length
-    const disconnected = integrations.filter(i => i.status === 'disconnected').length
-    const total = integrations.length
-    return { connected, degraded, disconnected, total }
-  }, [])
 
   // Filter nav groups based on role
   const navGroups = allNavGroups
@@ -210,15 +200,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <>
       <aside className={`fixed left-0 top-0 bottom-0 z-50 ${sidebarWidth} flex flex-col bg-gradient-to-b from-[#0C1220] via-forge-sidebar to-[#0C1220] overflow-hidden transition-all duration-300`}>
         {/* Brand */}
-        <div data-tour="brand" className={`flex items-center gap-3 ${collapsed ? 'px-3 justify-center' : 'px-5'} py-4 border-b border-white/[0.06]`}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-forge-teal to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-forge-teal/20">
-            <Shield size={20} className="text-white" />
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white tracking-tight">Forge Cyber</p>
-              <p className="text-[11px] text-forge-teal font-medium">Service Delivery</p>
-            </div>
+        <div data-tour="brand" className={`flex items-center ${collapsed ? 'px-2 justify-center' : 'px-4'} py-4 border-b border-white/[0.06]`}>
+          {collapsed ? (
+            <img src="/logo-circle.png" alt="Forge Cyber Defense" className="w-10 h-10 rounded-lg" />
+          ) : (
+            <img src="/logo.png" alt="Forge Cyber Defense" className="h-14 w-auto" />
           )}
         </div>
 
@@ -517,69 +503,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           >
             {collapsed ? <PanelLeftOpen size={16} /> : <><PanelLeftClose size={14} /><span>Collapse</span></>}
           </button>
-        </div>
-
-        {/* Integration Health */}
-        <div data-tour="integrations" className={`${collapsed ? 'px-2' : 'mx-3'} mb-1.5`}>
-          {!collapsed ? (
-            <div className="px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.04]">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Integrations</span>
-                <span className="text-[10px] text-white/30">{integrationHealth.connected}/{integrationHealth.total}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {integrations.map(i => (
-                  <div
-                    key={i.id}
-                    className="group/int relative"
-                    title={`${i.name}: ${i.status}`}
-                  >
-                    <div className={`w-2 h-2 rounded-full ${
-                      i.status === 'connected' ? 'bg-emerald-400 shadow-sm shadow-emerald-400/40' :
-                      i.status === 'degraded' ? 'bg-amber-400 shadow-sm shadow-amber-400/40 animate-pulse' :
-                      'bg-red-400 shadow-sm shadow-red-400/40'
-                    }`} />
-                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded-md bg-[#1A2332] border border-white/[0.08] text-[10px] text-white whitespace-nowrap opacity-0 group-hover/int:opacity-100 transition-opacity shadow-xl z-50">
-                      <span className="font-medium">{i.name}</span>
-                      <span className={`ml-1 ${
-                        i.status === 'connected' ? 'text-emerald-400' :
-                        i.status === 'degraded' ? 'text-amber-400' :
-                        'text-red-400'
-                      }`}>{i.status}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {(integrationHealth.degraded > 0 || integrationHealth.disconnected > 0) && (
-                <div className="flex items-center gap-1 mt-1.5">
-                  {integrationHealth.degraded > 0 && (
-                    <span className="flex items-center gap-0.5 text-[9px] text-amber-400/70">
-                      <AlertTriangle size={8} /> {integrationHealth.degraded} degraded
-                    </span>
-                  )}
-                  {integrationHealth.disconnected > 0 && (
-                    <span className="flex items-center gap-0.5 text-[9px] text-red-400/70">
-                      <WifiOff size={8} /> {integrationHealth.disconnected} offline
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <button
-              className="w-full flex justify-center py-2 rounded-lg bg-white/[0.03] border border-white/[0.04] group/int relative"
-              title={`Integrations: ${integrationHealth.connected}/${integrationHealth.total} connected`}
-            >
-              <Wifi size={14} className={`${
-                integrationHealth.disconnected > 0 ? 'text-red-400/60' :
-                integrationHealth.degraded > 0 ? 'text-amber-400/60' :
-                'text-emerald-400/60'
-              }`} />
-              <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 rounded-lg bg-[#1A2332] border border-white/[0.08] text-xs text-white whitespace-nowrap opacity-0 group-hover/int:opacity-100 transition-opacity shadow-xl z-50">
-                {integrationHealth.connected}/{integrationHealth.total} connected
-              </div>
-            </button>
-          )}
         </div>
 
         {/* Sidebar Footer Metrics */}

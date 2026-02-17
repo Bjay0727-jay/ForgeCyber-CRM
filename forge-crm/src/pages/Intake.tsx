@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -73,6 +73,14 @@ export default function Intake() {
     },
   })
 
+  // Restore saved draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('intake-draft')
+      if (saved) reset(JSON.parse(saved))
+    } catch { /* ignore corrupt data */ }
+  }, [reset])
+
   const onSubmit = async (data: IntakeFormData) => {
     setIsSubmitting(true)
     createOrganization({
@@ -86,6 +94,7 @@ export default function Intake() {
       budget: data.budget ?? '',
       notes: data.notes ?? '',
     } satisfies IntakePayload)
+    localStorage.removeItem('intake-draft')
     setIsSubmitting(false)
     setShowSuccess(true)
     setTimeout(() => { setShowSuccess(false); reset() }, 2000)

@@ -173,12 +173,12 @@ export default function Assessments() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-forge-border bg-forge-bg/50">
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Customer</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Type</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Started</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Progress</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Consultant</th>
-                <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Action</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Customer</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Type</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Started</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Progress</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Consultant</th>
+                <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -309,12 +309,12 @@ export default function Assessments() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-forge-border bg-forge-bg/50">
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Customer</th>
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Type</th>
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Started</th>
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Completed</th>
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Consultant</th>
-                    <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Action</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Customer</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Type</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Started</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Completed</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Consultant</th>
+                    <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-2.5 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>

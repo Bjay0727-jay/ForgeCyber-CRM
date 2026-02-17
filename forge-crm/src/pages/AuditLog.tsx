@@ -95,12 +95,12 @@ export default function AuditLog() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-forge-border bg-forge-bg/50">
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Action</th>
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">User</th>
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Target</th>
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Detail</th>
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Timestamp</th>
-              <th className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">IP</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Action</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">User</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Target</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Detail</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">Timestamp</th>
+              <th scope="col" className="text-left text-[11px] font-medium text-forge-text-muted uppercase tracking-wide py-3 px-5">IP</th>
             </tr>
           </thead>
           <tbody>

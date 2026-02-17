@@ -40,12 +40,6 @@ const tourSteps: TourStep[] = [
     position: 'right',
   },
   {
-    target: '[data-tour="integrations"]',
-    title: 'Integration Status',
-    body: 'Monitor the health of your connected tools — vulnerability scanners, SIEM, ticketing systems, and cloud platforms — at a glance.',
-    position: 'right',
-  },
-  {
     target: '[data-tour="profile"]',
     title: 'Profile & Settings',
     body: 'Switch roles, toggle dark/light mode, access account settings, or sign out. Your role determines which sections are visible.',

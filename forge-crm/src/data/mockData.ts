@@ -245,25 +245,6 @@ export const auditLog: AuditEntry[] = [
   { id: 'a12', action: 'access', user: 'Sarah Mitchell', target: 'Client Data', detail: 'Accessed Texas Health Resources assessment dashboard', timestamp: 'Jan 10, 2026 04:30 PM' },
 ]
 
-// API/Integration statuses
-export interface Integration {
-  id: string
-  name: string
-  type: 'scanner' | 'siem' | 'ticketing' | 'email' | 'cloud'
-  status: 'connected' | 'degraded' | 'disconnected'
-  lastSync: string
-  version?: string
-}
-
-export const integrations: Integration[] = [
-  { id: 'i1', name: 'ForgeScan 360', type: 'scanner', status: 'connected', lastSync: '2 min ago', version: 'v4.12.3' },
-  { id: 'i2', name: 'Splunk SIEM', type: 'siem', status: 'connected', lastSync: '5 min ago', version: 'v9.1' },
-  { id: 'i3', name: 'ServiceNow', type: 'ticketing', status: 'degraded', lastSync: '45 min ago', version: 'v3.2' },
-  { id: 'i4', name: 'Microsoft 365', type: 'email', status: 'connected', lastSync: '1 min ago' },
-  { id: 'i5', name: 'AWS Security Hub', type: 'cloud', status: 'connected', lastSync: '8 min ago' },
-  { id: 'i6', name: 'Qualys VMDR', type: 'scanner', status: 'disconnected', lastSync: '3 hours ago', version: 'v2.8' },
-]
-
 export const sampleFindings = [
   { severity: 'critical' as const, title: 'Unpatched Domain Controllers', desc: 'Two domain controllers running outdated OS versions with known CVEs. NIST Control: SI-2', nist: 'SI-2' },
   { severity: 'high' as const, title: 'Weak Password Policy', desc: 'Current policy allows 8-char passwords with no complexity. NIST Control: IA-5', nist: 'IA-5' },
