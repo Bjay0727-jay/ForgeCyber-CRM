@@ -3,6 +3,9 @@ import { Search, Bell, Plus, Moon, Sun, Building2, ClipboardCheck, Briefcase } f
 import { useNavigate } from 'react-router-dom'
 import { searchAll } from '../lib/api'
 import { useTheme } from '../context/ThemeContext'
+import { notifications as defaultNotifications } from '../data/mockData'
+import type { Notification } from '../data/mockData'
+import NotificationPanel from './NotificationPanel'
 
 interface TopBarProps {
   title: string
@@ -14,7 +17,11 @@ export default function TopBar({ title, breadcrumb }: TopBarProps) {
   const { theme, toggle: toggleTheme } = useTheme()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>(defaultNotifications)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const notifRef = useRef<HTMLDivElement>(null)
+  const unreadCount = notifications.filter(n => !n.read).length
 
   const results = query.trim().length >= 2 ? searchAll(query) : null
   const hasResults = results && (results.organizations.length + results.assessments.length + results.engagements.length) > 0
@@ -23,6 +30,9 @@ export default function TopBar({ title, breadcrumb }: TopBarProps) {
     function handleClickOutside(e: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setOpen(false)
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -133,10 +143,27 @@ export default function TopBar({ title, breadcrumb }: TopBarProps) {
           </button>
 
           {/* Notifications */}
-          <button className="relative p-2 rounded-lg text-forge-text-muted hover:bg-forge-bg transition-colors">
-            <Bell size={18} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-forge-danger ring-2 ring-white" />
-          </button>
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setNotifOpen(prev => !prev)}
+              className="relative p-2 rounded-lg text-forge-text-muted hover:bg-forge-bg transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-forge-danger ring-2 ring-white" />
+              )}
+            </button>
+            {notifOpen && (
+              <NotificationPanel
+                open={notifOpen}
+                notifications={notifications}
+                onClose={() => setNotifOpen(false)}
+                onMarkRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
+                onMarkAllRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
+              />
+            )}
+          </div>
 
           {/* New Customer */}
           <button

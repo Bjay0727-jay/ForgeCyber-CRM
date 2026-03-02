@@ -8,6 +8,13 @@ import {
 import type { Notification } from '../data/mockData'
 import { activities } from '../data/mockData'
 
+function renderActivityText(text: string) {
+  return text.split(/(<strong>.*?<\/strong>)/g).map((part, i) => {
+    const match = part.match(/^<strong>(.*)<\/strong>$/)
+    return match ? <strong key={i}>{match[1]}</strong> : part
+  })
+}
+
 type Tab = 'notifications' | 'activity'
 
 const typeConfig: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
@@ -160,7 +167,7 @@ export default function NotificationPanel({ open, onClose, notifications, onMark
                       <span className={style.color}>{style.icon}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-forge-text leading-relaxed" dangerouslySetInnerHTML={{ __html: activity.text }} />
+                      <p className="text-xs text-forge-text leading-relaxed">{renderActivityText(activity.text)}</p>
                       <p className="text-[10px] text-forge-text-faint mt-0.5">{activity.time}</p>
                     </div>
                   </div>

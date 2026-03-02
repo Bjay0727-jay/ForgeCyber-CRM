@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
+import { useToast } from '../components/Toast'
+import Pagination from '../components/Pagination'
 import { Play, Plus, Calendar, User, FileText, CheckCircle } from 'lucide-react'
 import { securityDomains } from '../data/mockData'
 import {
@@ -54,6 +56,7 @@ const inputClasses =
   'w-full py-2.5 px-3.5 border border-forge-border rounded-lg text-sm text-forge-text bg-white focus:outline-none focus:ring-2 focus:ring-forge-teal/20 focus:border-forge-teal transition-colors'
 
 export default function Assessments() {
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<Tab>('active')
   const [modalOpen, setModalOpen] = useState(false)
   const [modalTab, setModalTab] = useState<ModalTab>('org')
@@ -75,8 +78,15 @@ export default function Assessments() {
     setOrganizations(getOrganizations())
   }, [])
 
+  const [activePage, setActivePage] = useState(0)
+  const [completedPage, setCompletedPage] = useState(0)
+  const perPage = 10
+
   const activeAssessments = useMemo(() => allAssessments.filter((a) => a.status !== 'completed'), [allAssessments])
   const completedAssessments = useMemo(() => allAssessments.filter((a) => a.status === 'completed'), [allAssessments])
+
+  const paginatedActive = useMemo(() => activeAssessments.slice(activePage * perPage, (activePage + 1) * perPage), [activeAssessments, activePage])
+  const paginatedCompleted = useMemo(() => completedAssessments.slice(completedPage * perPage, (completedPage + 1) * perPage), [completedAssessments, completedPage])
 
   const selectedAssessment = useMemo(
     () => (selectedAssessmentId ? allAssessments.find((a) => a.id === selectedAssessmentId) : undefined),
@@ -116,36 +126,47 @@ export default function Assessments() {
 
   const handleSaveProgress = () => {
     if (selectedAssessmentId) {
-      updateAssessmentRatings(selectedAssessmentId, ratings)
-      refresh()
+      try {
+        updateAssessmentRatings(selectedAssessmentId, ratings)
+        refresh()
+        toast('success', 'Assessment ratings saved')
+      } catch {
+        toast('error', 'Failed to save ratings')
+      }
     }
     setModalOpen(false)
   }
 
   const handleCreateAssessment = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formCustomerId || !formType || !formConsultant) return
+    if (!formCustomerId || !formType || !formConsultant) {
+      toast('warning', 'Please fill in all required fields')
+      return
+    }
 
-    createAssessment({
-      customerId: formCustomerId,
-      type: formType,
-      consultant: formConsultant,
-      targetDate: formStartDate,
-    })
+    try {
+      createAssessment({
+        customerId: formCustomerId,
+        type: formType,
+        consultant: formConsultant,
+        targetDate: formStartDate,
+      })
 
-    // Reset form
-    setFormCustomerId('')
-    setFormType('')
-    setFormConsultant('')
-    setFormStartDate('')
-    setFormSuccess(true)
-    refresh()
+      setFormCustomerId('')
+      setFormType('')
+      setFormConsultant('')
+      setFormStartDate('')
+      setFormSuccess(true)
+      refresh()
+      toast('success', 'Assessment created successfully')
 
-    // Switch to active tab after a brief delay so user sees the success message
-    setTimeout(() => {
-      setFormSuccess(false)
-      setActiveTab('active')
-    }, 1500)
+      setTimeout(() => {
+        setFormSuccess(false)
+        setActiveTab('active')
+      }, 1500)
+    } catch {
+      toast('error', 'Failed to create assessment. Please try again.')
+    }
   }
 
   return (
@@ -170,6 +191,7 @@ export default function Assessments() {
       {/* Active Assessments */}
       {activeTab === 'active' && (
         <Card title="Active Assessments" noPadding>
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-forge-border bg-forge-bg/50">
@@ -182,7 +204,7 @@ export default function Assessments() {
               </tr>
             </thead>
             <tbody>
-              {activeAssessments.map((assessment) => (
+              {paginatedActive.map((assessment) => (
                 <tr key={assessment.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
                   <td className="py-3 px-4 text-sm font-medium text-forge-text">{assessment.organizationName}</td>
                   <td className="py-3 px-4"><Badge variant={getTypeVariant(assessment.type)}>{assessment.type}</Badge></td>
@@ -207,15 +229,17 @@ export default function Assessments() {
                   </td>
                 </tr>
               ))}
-              {activeAssessments.length === 0 && (
+              {paginatedActive.length === 0 && (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-sm text-forge-text-muted">
-                    No active assessments. Create one from the "New Assessment" tab.
+                    No active assessments. Create one from the &quot;New Assessment&quot; tab.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+          </div>
+          <Pagination total={activeAssessments.length} page={activePage} perPage={perPage} onPageChange={setActivePage} />
         </Card>
       )}
 
@@ -306,6 +330,7 @@ export default function Assessments() {
         <>
           {completedAssessments.length > 0 ? (
             <Card title="Completed Assessments" noPadding>
+              <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-forge-border bg-forge-bg/50">
@@ -318,7 +343,7 @@ export default function Assessments() {
                   </tr>
                 </thead>
                 <tbody>
-                  {completedAssessments.map((assessment) => (
+                  {paginatedCompleted.map((assessment) => (
                     <tr key={assessment.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
                       <td className="py-3 px-4 text-sm font-medium text-forge-text">{assessment.organizationName}</td>
                       <td className="py-3 px-4"><Badge variant={getTypeVariant(assessment.type)}>{assessment.type}</Badge></td>
@@ -338,6 +363,8 @@ export default function Assessments() {
                   ))}
                 </tbody>
               </table>
+              </div>
+              <Pagination total={completedAssessments.length} page={completedPage} perPage={perPage} onPageChange={setCompletedPage} />
             </Card>
           ) : (
             <Card>
@@ -482,18 +509,25 @@ export default function Assessments() {
         {modalTab === 'recommendations' && (
           <div className="space-y-3">
             {[
-              { num: 1, priority: 'danger', title: 'Immediate: Patch Domain Controllers', desc: 'Apply latest security patches to all domain controllers. Schedule emergency maintenance window within 72 hours.' },
-              { num: 2, priority: 'warning', title: 'High: Strengthen Password Policy', desc: 'Implement 16-character minimum password policy with complexity requirements. Deploy MFA for all privileged accounts within 30 days.' },
-              { num: 3, priority: 'info', title: 'Medium: Expand SIEM Coverage', desc: 'Deploy log forwarding agents to remaining 30% of endpoints. Configure unified audit policy across all systems.' },
-            ].map((rec) => (
+              { num: 1, priority: 'danger' as const, title: 'Immediate: Patch Domain Controllers', desc: 'Apply latest security patches to all domain controllers. Schedule emergency maintenance window within 72 hours.' },
+              { num: 2, priority: 'warning' as const, title: 'High: Strengthen Password Policy', desc: 'Implement 16-character minimum password policy with complexity requirements. Deploy MFA for all privileged accounts within 30 days.' },
+              { num: 3, priority: 'info' as const, title: 'Medium: Expand SIEM Coverage', desc: 'Deploy log forwarding agents to remaining 30% of endpoints. Configure unified audit policy across all systems.' },
+            ].map((rec) => {
+              const priorityStyles = {
+                danger: 'bg-forge-danger/8 text-forge-danger',
+                warning: 'bg-forge-warning/8 text-forge-warning',
+                info: 'bg-forge-info/8 text-forge-info',
+              }
+              return (
               <div key={rec.num} className="p-3.5 rounded-lg border border-forge-border">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-semibold bg-forge-${rec.priority}/8 text-forge-${rec.priority}`}>{rec.num}</span>
+                  <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-semibold ${priorityStyles[rec.priority]}`}>{rec.num}</span>
                   <h4 className="text-sm font-medium text-forge-text">{rec.title}</h4>
                 </div>
                 <p className="text-sm text-forge-text-muted ml-7">{rec.desc}</p>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
@@ -508,10 +542,10 @@ export default function Assessments() {
               Compile all domain ratings, findings, and recommendations into a comprehensive document.
             </p>
             <div className="flex justify-center gap-2">
-              <button className="px-4 py-2 rounded-lg border border-forge-border text-sm font-medium text-forge-text-muted hover:bg-forge-bg transition-colors">
-                Preview Draft
-              </button>
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors">
+              <button
+                onClick={() => toast('info', 'PDF generation requires server-side setup')}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors"
+              >
                 <FileText size={15} />
                 Generate PDF
               </button>

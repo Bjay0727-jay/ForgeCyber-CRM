@@ -18,6 +18,13 @@ import { activities } from '../data/mockData'
 import Badge from '../components/Badge'
 import Card from '../components/Card'
 
+function renderActivityText(text: string) {
+  return text.split(/(<strong>.*?<\/strong>)/g).map((part, i) => {
+    const match = part.match(/^<strong>(.*)<\/strong>$/)
+    return match ? <strong key={i}>{match[1]}</strong> : part
+  })
+}
+
 const iconMap: Record<string, React.ReactNode> = {
   users: <Users size={20} />,
   'clipboard-check': <ClipboardCheck size={20} />,
@@ -88,7 +95,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <button
             key={stat.label}
@@ -122,7 +129,7 @@ export default function Dashboard() {
       </div>
 
       {/* Content Grid */}
-      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 380px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
         {/* Active Engagements */}
         <Card
           title="Active Engagements"
@@ -137,6 +144,7 @@ export default function Dashboard() {
             </button>
           }
         >
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-forge-border bg-forge-bg/50">
@@ -162,6 +170,7 @@ export default function Dashboard() {
               })}
             </tbody>
           </table>
+          </div>
         </Card>
 
         {/* Recent Activity */}
@@ -175,7 +184,7 @@ export default function Dashboard() {
                     {style.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-forge-text leading-relaxed" dangerouslySetInnerHTML={{ __html: activity.text }} />
+                    <p className="text-sm text-forge-text leading-relaxed">{renderActivityText(activity.text)}</p>
                     <p className="text-xs text-forge-text-faint mt-0.5">{activity.time}</p>
                   </div>
                 </div>

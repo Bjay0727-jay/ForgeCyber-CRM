@@ -1,7 +1,8 @@
 import { useState, lazy, Suspense } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const CRM = lazy(() => import('./pages/CRM'))
@@ -13,6 +14,7 @@ const Operations = lazy(() => import('./pages/Operations'))
 const Reports = lazy(() => import('./pages/Reports'))
 const Team = lazy(() => import('./pages/Team'))
 const AuditLog = lazy(() => import('./pages/AuditLog'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 const pages: Record<string, { title: string; breadcrumb: string }> = {
   '/dashboard': { title: 'Service Delivery Dashboard', breadcrumb: 'Home / Dashboard' },
@@ -49,21 +51,23 @@ export default function App() {
       <main id="main-content" className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]'}`}>
         <TopBar title={page.title} breadcrumb={page.breadcrumb} />
         <div className="p-6" key={location.pathname}>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/crm" element={<CRM />} />
-              <Route path="/intake" element={<Intake />} />
-              <Route path="/assessments" element={<Assessments />} />
-              <Route path="/workflow" element={<Workflow />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/operations" element={<Operations />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/audit-log" element={<AuditLog />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/crm" element={<CRM />} />
+                <Route path="/intake" element={<Intake />} />
+                <Route path="/assessments" element={<Assessments />} />
+                <Route path="/workflow" element={<Workflow />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/operations" element={<Operations />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/audit-log" element={<AuditLog />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
     </div>

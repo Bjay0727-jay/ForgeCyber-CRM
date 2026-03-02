@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   ClipboardCheck, FileText, ShieldCheck, AlertTriangle,
   UserPlus, Settings, Layers, BarChart3,
@@ -132,8 +132,19 @@ export default function Templates() {
   const [editorInitialData, setEditorInitialData] = useState<Record<string, string | string[]> | null>(null)
   const [editingDocId, setEditingDocId] = useState<string | null>(null)
 
-  // Saved documents
-  const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([])
+  // Saved documents — persisted to localStorage
+  const [savedDocs, setSavedDocs] = useState<SavedDocument[]>(() => {
+    try {
+      const stored = localStorage.getItem('forge_crm_saved_docs')
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('forge_crm_saved_docs', JSON.stringify(savedDocs))
+  }, [savedDocs])
 
   const totalUsage = useMemo(() => templateList.reduce((sum, t) => sum + t.usageCount, 0), [templateList])
 

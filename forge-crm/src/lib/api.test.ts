@@ -3,18 +3,32 @@ import {
   getOrganizations,
   getOrganization,
   createOrganization,
+  updateOrganization,
+  deleteOrganization,
   getContacts,
   getContactsByOrganization,
+  createContact,
+  updateContact,
+  deleteContact,
   getOpportunities,
   updateOpportunityStage,
+  updateOpportunity,
+  deleteOpportunity,
   getAssessments,
   getAssessment,
   createAssessment,
   updateAssessmentRatings,
   updateAssessmentProgress,
   addAssessmentFinding,
+  deleteAssessment,
   getEngagements,
+  createEngagement,
+  updateEngagement,
+  deleteEngagement,
   getTeamMembers,
+  createTeamMember,
+  updateTeamMember,
+  deleteTeamMember,
   searchAll,
   resetAllData,
 } from './api'
@@ -286,5 +300,148 @@ describe('Contacts', () => {
     for (const c of contacts) {
       expect(c.organizationId).toBe(orgs[0].id)
     }
+  })
+
+  it('createContact adds a new contact', () => {
+    const orgs = getOrganizations()
+    const before = getContacts().length
+    const contact = createContact({
+      organizationId: orgs[0].id,
+      name: 'New Contact',
+      title: 'Engineer',
+      email: 'new@test.com',
+      phone: '555-0001',
+      preferredContact: 'email',
+    })
+    expect(contact.id).toBeTruthy()
+    expect(contact.name).toBe('New Contact')
+    expect(getContacts().length).toBe(before + 1)
+  })
+
+  it('updateContact merges data', () => {
+    const contacts = getContacts()
+    const updated = updateContact(contacts[0].id, { title: 'Updated Title' })
+    expect(updated.title).toBe('Updated Title')
+    expect(updated.name).toBe(contacts[0].name)
+  })
+
+  it('deleteContact removes the contact', () => {
+    const contacts = getContacts()
+    const before = contacts.length
+    deleteContact(contacts[0].id)
+    expect(getContacts().length).toBe(before - 1)
+  })
+})
+
+describe('Organization CRUD', () => {
+  it('updateOrganization merges fields', () => {
+    const orgs = getOrganizations()
+    const updated = updateOrganization(orgs[0].id, { sector: 'Updated Sector' })
+    expect(updated.sector).toBe('Updated Sector')
+    expect(updated.name).toBe(orgs[0].name)
+  })
+
+  it('deleteOrganization cascade deletes contacts and opportunities', () => {
+    const orgs = getOrganizations()
+    const orgId = orgs[0].id
+    const contactsBefore = getContacts().length
+    const orgContacts = getContactsByOrganization(orgId).length
+
+    deleteOrganization(orgId)
+
+    expect(getOrganization(orgId)).toBeUndefined()
+    expect(getContacts().length).toBe(contactsBefore - orgContacts)
+  })
+})
+
+describe('Opportunity CRUD', () => {
+  it('updateOpportunity merges fields', () => {
+    const opps = getOpportunities()
+    const updated = updateOpportunity(opps[0].id, { value: 999999 })
+    expect(updated.value).toBe(999999)
+    expect(updated.organizationName).toBe(opps[0].organizationName)
+  })
+
+  it('deleteOpportunity removes the opportunity', () => {
+    const before = getOpportunities().length
+    const opps = getOpportunities()
+    deleteOpportunity(opps[0].id)
+    expect(getOpportunities().length).toBe(before - 1)
+  })
+})
+
+describe('Assessment CRUD', () => {
+  it('deleteAssessment removes the assessment', () => {
+    const before = getAssessments().length
+    const assessments = getAssessments()
+    deleteAssessment(assessments[0].id)
+    expect(getAssessments().length).toBe(before - 1)
+  })
+})
+
+describe('Engagement CRUD', () => {
+  it('createEngagement adds a new engagement', () => {
+    const before = getEngagements().length
+    const eng = createEngagement({
+      organizationId: 'org-1',
+      organizationName: 'Test Org',
+      type: 'Pen Test',
+      consultant: 'Jane Doe',
+      status: 'on_track',
+      hoursUsed: 10,
+      hoursBudget: 40,
+      revenue: 5000,
+      dueDate: '2026-03-01',
+      createdAt: '2026-01-01',
+    })
+    expect(eng.id).toBeTruthy()
+    expect(eng.type).toBe('Pen Test')
+    expect(getEngagements().length).toBe(before + 1)
+  })
+
+  it('updateEngagement merges fields', () => {
+    const engs = getEngagements()
+    const updated = updateEngagement(engs[0].id, { hoursUsed: 99 })
+    expect(updated.hoursUsed).toBe(99)
+    expect(updated.organizationName).toBe(engs[0].organizationName)
+  })
+
+  it('deleteEngagement removes the engagement', () => {
+    const before = getEngagements().length
+    const engs = getEngagements()
+    deleteEngagement(engs[0].id)
+    expect(getEngagements().length).toBe(before - 1)
+  })
+})
+
+describe('TeamMember CRUD', () => {
+  it('createTeamMember adds a new member', () => {
+    const before = getTeamMembers().length
+    const member = createTeamMember({
+      initials: 'TM',
+      name: 'Test Member',
+      role: 'Analyst',
+      status: 'available',
+      specializations: ['NIST', 'CMMC'],
+      utilization: 50,
+      activeEngagements: 2,
+    })
+    expect(member.id).toBeTruthy()
+    expect(member.name).toBe('Test Member')
+    expect(getTeamMembers().length).toBe(before + 1)
+  })
+
+  it('updateTeamMember merges fields', () => {
+    const members = getTeamMembers()
+    const updated = updateTeamMember(members[0].id, { utilization: 80 })
+    expect(updated.utilization).toBe(80)
+    expect(updated.name).toBe(members[0].name)
+  })
+
+  it('deleteTeamMember removes the member', () => {
+    const before = getTeamMembers().length
+    const members = getTeamMembers()
+    deleteTeamMember(members[0].id)
+    expect(getTeamMembers().length).toBe(before - 1)
   })
 })

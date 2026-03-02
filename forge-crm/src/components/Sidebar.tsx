@@ -42,7 +42,6 @@ const allNavGroups: NavGroup[] = [
   { heading: 'Admin', items: [
     { label: 'Team', icon: <UsersRound size={18} />, to: '/team' },
     { label: 'Audit Log', icon: <ScrollText size={18} />, to: '/audit-log' },
-    { label: 'Settings', icon: <Settings size={18} />, to: '/settings' },
   ]},
 ]
 
@@ -53,13 +52,13 @@ const badgeStyles: Record<string, string> = {
   red: 'bg-red-500/20 text-red-400',
 }
 
-// Live badge counts from API data
+// Live badge counts from API data (no memo — these are cheap reads that should update on every render)
 function useBadgeCounts(): Record<string, number> {
-  return useMemo(() => ({
+  return {
     crm: getOpportunities().length,
     assessments: getAssessments().filter(a => a.status !== 'completed').length,
     operations: getEngagements().filter(e => e.status !== 'completed').length,
-  }), [])
+  }
 }
 
 // Favorites persistence
