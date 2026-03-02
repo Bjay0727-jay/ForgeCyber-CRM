@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useToast } from '../components/Toast'
 import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -46,6 +47,7 @@ const inputClasses = (hasError: boolean): string =>
   }`
 
 export default function Intake() {
+  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDraftSaving, setIsDraftSaving] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -83,27 +85,32 @@ export default function Intake() {
 
   const onSubmit = async (data: IntakeFormData) => {
     setIsSubmitting(true)
-    createOrganization({
-      organization: { name: data.organization.name, sector: data.organization.sector, address: data.organization.address ?? '', cityStateZip: data.organization.cityStateZip ?? '', website: data.organization.website ?? '', employeeCount: data.organization.employeeCount ?? '' },
-      contact: { name: data.contact.name, title: data.contact.title ?? '', email: data.contact.email, phone: data.contact.phone ?? '', preferredContact: data.contact.preferredContact },
-      compliance: data.compliance ?? [],
-      securityTools: data.securityTools ?? '',
-      securityChallenges: data.securityChallenges ?? '',
-      services: data.services ?? [],
-      timeline: data.timeline ?? '',
-      budget: data.budget ?? '',
-      notes: data.notes ?? '',
-    } satisfies IntakePayload)
-    localStorage.removeItem('intake-draft')
-    setIsSubmitting(false)
-    setShowSuccess(true)
-    setTimeout(() => { setShowSuccess(false); reset() }, 2000)
+    try {
+      createOrganization({
+        organization: { name: data.organization.name, sector: data.organization.sector, address: data.organization.address ?? '', cityStateZip: data.organization.cityStateZip ?? '', website: data.organization.website ?? '', employeeCount: data.organization.employeeCount ?? '' },
+        contact: { name: data.contact.name, title: data.contact.title ?? '', email: data.contact.email, phone: data.contact.phone ?? '', preferredContact: data.contact.preferredContact },
+        compliance: data.compliance ?? [],
+        securityTools: data.securityTools ?? '',
+        securityChallenges: data.securityChallenges ?? '',
+        services: data.services ?? [],
+        timeline: data.timeline ?? '',
+        budget: data.budget ?? '',
+        notes: data.notes ?? '',
+      } satisfies IntakePayload)
+      localStorage.removeItem('intake-draft')
+      setShowSuccess(true)
+      toast('success', 'Organization created successfully')
+      setTimeout(() => { setShowSuccess(false); reset() }, 2000)
+    } catch {
+      toast('error', 'Failed to create organization. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = () => {
     setIsDraftSaving(true)
     const values = getValues()
-    await new Promise((resolve) => setTimeout(resolve, 1000))
     localStorage.setItem('intake-draft', JSON.stringify(values))
     setIsDraftSaving(false)
     setDraftSaved(true)

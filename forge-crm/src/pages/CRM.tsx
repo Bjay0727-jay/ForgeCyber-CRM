@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useToast } from '../components/Toast'
 import { Plus, Filter, GripVertical } from 'lucide-react'
 import {
   DndContext,
@@ -225,6 +226,7 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function CRM() {
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<Tab>('pipeline')
   const [sectorFilter, setSectorFilter] = useState('all')
   const [columns, setColumns] = useState<PipelineColumn[]>(buildInitialColumns)
@@ -358,7 +360,12 @@ export default function CRM() {
 
     // Persist stage change via API
     if (sourceColumn.id !== destColumn.id) {
-      updateOpportunityStage(activeId, destColumn.id as Opportunity['stage'])
+      try {
+        updateOpportunityStage(activeId, destColumn.id as Opportunity['stage'])
+      } catch {
+        toast('error', 'Failed to update opportunity stage')
+        return
+      }
     }
 
     if (sourceColumn.id === destColumn.id && !isColumnId(overId)) {
@@ -419,7 +426,7 @@ export default function CRM() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-3">
             {columns.map((col) => (
               <DroppableColumn
                 key={col.id}

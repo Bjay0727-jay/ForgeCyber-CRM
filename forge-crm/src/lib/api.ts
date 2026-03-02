@@ -481,6 +481,112 @@ export function searchAll(query: string): {
   return { organizations, assessments, engagements }
 }
 
+// ─── Update & Delete Operations ─────────────────────────────────────────────
+
+export function updateOrganization(id: string, data: Partial<Organization>): Organization {
+  const orgs = store.get<Organization[]>('organizations') ?? []
+  const idx = orgs.findIndex((o) => o.id === id)
+  if (idx === -1) throw new Error(`Organization ${id} not found`)
+  orgs[idx] = { ...orgs[idx], ...data, id }
+  store.set('organizations', orgs)
+  return orgs[idx]
+}
+
+export function deleteOrganization(id: string): void {
+  const orgs = store.get<Organization[]>('organizations') ?? []
+  store.set('organizations', orgs.filter((o) => o.id !== id))
+  // Cascade: remove contacts and opportunities linked to this org
+  const contacts = store.get<Contact[]>('contacts') ?? []
+  store.set('contacts', contacts.filter((c) => c.organizationId !== id))
+  const opps = store.get<Opportunity[]>('opportunities') ?? []
+  store.set('opportunities', opps.filter((o) => o.organizationId !== id))
+}
+
+export function createContact(data: Omit<Contact, 'id'>): Contact {
+  const contacts = store.get<Contact[]>('contacts') ?? []
+  const newContact: Contact = { ...data, id: crypto.randomUUID() }
+  contacts.push(newContact)
+  store.set('contacts', contacts)
+  return newContact
+}
+
+export function updateContact(id: string, data: Partial<Contact>): Contact {
+  const contacts = store.get<Contact[]>('contacts') ?? []
+  const idx = contacts.findIndex((c) => c.id === id)
+  if (idx === -1) throw new Error(`Contact ${id} not found`)
+  contacts[idx] = { ...contacts[idx], ...data, id }
+  store.set('contacts', contacts)
+  return contacts[idx]
+}
+
+export function deleteContact(id: string): void {
+  const contacts = store.get<Contact[]>('contacts') ?? []
+  store.set('contacts', contacts.filter((c) => c.id !== id))
+}
+
+export function updateOpportunity(id: string, data: Partial<Opportunity>): Opportunity {
+  const opps = store.get<Opportunity[]>('opportunities') ?? []
+  const idx = opps.findIndex((o) => o.id === id)
+  if (idx === -1) throw new Error(`Opportunity ${id} not found`)
+  opps[idx] = { ...opps[idx], ...data, id, updatedAt: new Date().toISOString() }
+  store.set('opportunities', opps)
+  return opps[idx]
+}
+
+export function deleteOpportunity(id: string): void {
+  const opps = store.get<Opportunity[]>('opportunities') ?? []
+  store.set('opportunities', opps.filter((o) => o.id !== id))
+}
+
+export function deleteAssessment(id: string): void {
+  const assessments = store.get<Assessment[]>('assessments') ?? []
+  store.set('assessments', assessments.filter((a) => a.id !== id))
+}
+
+export function createEngagement(data: Omit<Engagement, 'id'>): Engagement {
+  const engagements = store.get<Engagement[]>('engagements') ?? []
+  const newEng: Engagement = { ...data, id: crypto.randomUUID() }
+  engagements.push(newEng)
+  store.set('engagements', engagements)
+  return newEng
+}
+
+export function updateEngagement(id: string, data: Partial<Engagement>): Engagement {
+  const engagements = store.get<Engagement[]>('engagements') ?? []
+  const idx = engagements.findIndex((e) => e.id === id)
+  if (idx === -1) throw new Error(`Engagement ${id} not found`)
+  engagements[idx] = { ...engagements[idx], ...data, id }
+  store.set('engagements', engagements)
+  return engagements[idx]
+}
+
+export function deleteEngagement(id: string): void {
+  const engagements = store.get<Engagement[]>('engagements') ?? []
+  store.set('engagements', engagements.filter((e) => e.id !== id))
+}
+
+export function createTeamMember(data: Omit<TeamMember, 'id'>): TeamMember {
+  const members = store.get<TeamMember[]>('teamMembers') ?? []
+  const newMember: TeamMember = { ...data, id: crypto.randomUUID() }
+  members.push(newMember)
+  store.set('teamMembers', members)
+  return newMember
+}
+
+export function updateTeamMember(id: string, data: Partial<TeamMember>): TeamMember {
+  const members = store.get<TeamMember[]>('teamMembers') ?? []
+  const idx = members.findIndex((m) => m.id === id)
+  if (idx === -1) throw new Error(`Team member ${id} not found`)
+  members[idx] = { ...members[idx], ...data, id }
+  store.set('teamMembers', members)
+  return members[idx]
+}
+
+export function deleteTeamMember(id: string): void {
+  const members = store.get<TeamMember[]>('teamMembers') ?? []
+  store.set('teamMembers', members.filter((m) => m.id !== id))
+}
+
 // ─── Utility: Reset all data (useful for development) ───────────────────────
 
 export function resetAllData(): void {
