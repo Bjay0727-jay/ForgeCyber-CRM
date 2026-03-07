@@ -1,0 +1,5 @@
+{
+  "name": "forge-reporter",
+  "pages_build_output_dir": "./forge-crm/dist",
+  "compatibility_date": "2026-03-07"
+}

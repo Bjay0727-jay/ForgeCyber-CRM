@@ -1,45 +1,49 @@
-# Forge Service Delivery Portal - Cloudflare Pages Deployment
+# Forge CRM - Cloudflare Pages Deployment
 
 ## Why Cloudflare Pages?
 
 Cloudflare Pages is the **recommended deployment option** for Forge web assets because:
 
-- ✅ Enterprise-grade security (DDoS protection, WAF)
-- ✅ Global CDN with 300+ edge locations
-- ✅ Free SSL/TLS certificates (automatic)
-- ✅ Zero server maintenance
-- ✅ Demonstrates security-first approach to clients
-- ✅ Free tier available
+- Enterprise-grade security (DDoS protection, WAF)
+- Global CDN with 300+ edge locations
+- Free SSL/TLS certificates (automatic)
+- Zero server maintenance
+- Demonstrates security-first approach to clients
+- Free tier available
 
 ---
 
-## Quick Deployment (5 Minutes)
+## Current Project: `forge-reporter`
 
-### Step 1: Create Cloudflare Account
+- **Production URL:** `https://forge-reporter.pages.dev`
+- **Production branch:** `main`
+- **Framework:** React 19 + Vite + TypeScript
+- **Root directory:** `forge-crm`
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
 
-1. Go to [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
-2. Create account with your business email
-3. Verify your email address
+---
 
-### Step 2: Create Pages Project
+## Build Configuration (Required Settings)
 
-1. In Cloudflare Dashboard, click **Workers & Pages** in left sidebar
-2. Click **Create** button
-3. Select **Pages** tab
-4. Click **Upload assets**
+The build settings must be configured in the Cloudflare dashboard under
+**Workers & Pages > forge-reporter > Settings > Builds & deployments**:
 
-### Step 3: Upload Portal
+| Setting | Value |
+|---------|-------|
+| Production branch | `main` |
+| Root directory (path) | `forge-crm` |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
 
-1. **Project name:** `forge-service-delivery` (or your preference)
-2. Click **Create project**
-3. Drag and drop `Forge_MSSP_ServiceDelivery_Portal.html` into the upload area
-4. **Important:** Rename the file to `index.html` before uploading, OR upload and set up a redirect
+A `wrangler.jsonc` file is also included in `forge-crm/` as the source-of-truth
+for Pages Functions configuration.
 
-### Step 4: Deploy
+### Environment Variables (optional)
 
-1. Click **Deploy site**
-2. Wait 30-60 seconds
-3. Your portal is live at: `https://forge-service-delivery.pages.dev`
+| Variable | Value | Notes |
+|----------|-------|-------|
+| `NODE_VERSION` | `20` | Ensures Node 20 is used in the build |
 
 ---
 
@@ -139,66 +143,44 @@ Restrict access to office IP addresses:
 
 ## Deployment via Git (CI/CD)
 
-For automated deployments when the portal is updated:
+The project is connected to GitHub for automatic deployments:
 
-### Step 1: Create GitHub Repository
+- Every push to `main` triggers a **production deployment**
+- Every push to a non-main branch triggers a **preview deployment**
 
-```bash
-# Create repo structure
-mkdir forge-service-delivery-portal
-cd forge-service-delivery-portal
+### Updating Build Settings
 
-# Add portal file (renamed to index.html)
-cp Forge_MSSP_ServiceDelivery_Portal.html index.html
+If the build settings need to be reconfigured:
 
-# Initialize git
-git init
-git add .
-git commit -m "Initial commit"
-
-# Push to GitHub
-git remote add origin https://github.com/your-org/forge-service-delivery-portal.git
-git push -u origin main
-```
-
-### Step 2: Connect to Cloudflare Pages
-
-1. In Cloudflare Pages, click **Create a project**
-2. Select **Connect to Git**
-3. Authorize Cloudflare to access your GitHub
-4. Select the repository
-5. Configure build settings:
-   - Build command: (leave empty)
-   - Build output directory: `/`
-6. Click **Save and Deploy**
-
-Now every push to `main` triggers automatic deployment!
+1. Go to **Workers & Pages** > **forge-reporter** > **Settings** > **Builds & deployments**
+2. Set **Root directory (path)** to `forge-crm`
+3. Set **Build command** to `npm run build`
+4. Set **Build output directory** to `dist`
+5. Click **Save**
+6. Trigger a new deployment: **Deployments** > **Create deployment** > select `main`
 
 ---
 
-## Updating the Portal
+## Updating the CRM
 
-### Manual Upload Method
-
-1. Go to Workers & Pages in Cloudflare Dashboard
-2. Select your project
-3. Click **Create new deployment**
-4. Upload the updated `index.html`
-5. Click **Deploy**
-
-### Git Method
+### Git Method (Recommended)
 
 ```bash
-# Update the file
-cp new-version.html index.html
-
-# Commit and push
-git add index.html
-git commit -m "Update portal v1.1"
+# Make changes in forge-crm/
+# Commit and push to main
 git push origin main
 
-# Cloudflare automatically deploys!
+# Cloudflare automatically builds and deploys!
 ```
+
+### Manual Retry
+
+If a deployment fails or doesn't trigger:
+
+1. Go to **Workers & Pages** > **forge-reporter** > **Deployments**
+2. Click **Create deployment**
+3. Select the `main` branch
+4. Click **Begin deployment**
 
 ---
 
@@ -242,17 +224,18 @@ For more detailed analytics:
 
 | Issue | Solution |
 |-------|----------|
-| 404 Not Found | Ensure file is named `index.html` |
+| Build fails | Check root directory is set to `forge-crm` in build settings |
+| 404 on page refresh | Ensure `_redirects` file (`/* /index.html 200`) is in `public/` |
+| Old version showing | Clear browser cache, or purge via Caching > Purge Everything |
 | Custom domain not working | Check DNS propagation (can take 24-48h) |
 | SSL certificate pending | Wait 5-15 minutes for auto-provisioning |
 | Access denied | Check Cloudflare Access policies |
-| Old version showing | Clear browser cache or wait for CDN propagation |
 
 ### Force Cache Clear
 
 After deployment, you can purge the cache:
 
-1. Go to **Caching** → **Configuration**
+1. Go to **Caching** > **Configuration**
 2. Click **Purge Everything**
 
 ---

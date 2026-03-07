@@ -1,0 +1,7 @@
+{
+  "name": "forgecyber-crm",
+  "private": true,
+  "scripts": {
+    "build": "cd forge-crm && npm ci && npm run build"
+  }
+}
