@@ -10,6 +10,7 @@ import {
   updateAssessmentRatings,
   getOrganizations,
   getOrganization,
+  getTeamMembers,
 } from '../lib/api'
 import Badge from '../components/Badge'
 import Card from '../components/Card'
@@ -298,10 +299,9 @@ export default function Assessments() {
                 required
               >
                 <option value="">Select consultant...</option>
-                <option value="Michael Torres">Michael Torres</option>
-                <option value="Sarah Mitchell">Sarah Mitchell</option>
-                <option value="James Wilson">James Wilson</option>
-                <option value="Emily Chen">Emily Chen</option>
+                {getTeamMembers().map((m) => (
+                  <option key={m.id} value={m.name}>{m.name}</option>
+                ))}
               </select>
             </div>
             <div>

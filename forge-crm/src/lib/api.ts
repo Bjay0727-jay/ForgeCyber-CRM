@@ -1,11 +1,5 @@
 import {
-  customers,
-  pipelineColumns,
-  operationsEngagements,
-  activeAssessments,
-  teamMembers as teamMembersData,
   securityDomains,
-  sampleFindings,
 } from '../data/mockData'
 
 import type {
@@ -23,8 +17,6 @@ import type {
 // ─── LocalStorage Store ─────────────────────────────────────────────────────
 
 const STORAGE_PREFIX = 'forge_crm_'
-const SEED_VERSION_KEY = `${STORAGE_PREFIX}seed_version`
-const CURRENT_SEED_VERSION = '1'
 
 const store = {
   get<T>(key: string): T | null {
@@ -45,204 +37,10 @@ const store = {
   },
 }
 
-// ─── Seed Data Conversion ───────────────────────────────────────────────────
-
-/** Parse sector from the customer detail string like "Defense Contractor - Arlington, VA - CMMC Level 2" */
-function parseSector(detail: string): string {
-  return detail.split('\u2022')[0]?.trim() ?? ''
-}
-
-/** Parse city/state from customer detail */
-function parseCityState(detail: string): string {
-  const parts = detail.split('\u2022')
-  return parts[1]?.trim() ?? ''
-}
-
-/** Map the mock pipeline stage title to a typed stage value */
-function normalizeStage(title: string): Opportunity['stage'] {
-  const map: Record<string, Opportunity['stage']> = {
-    'Lead': 'lead',
-    'Assessment': 'assessment',
-    'Proposal': 'proposal',
-    'Negotiation': 'negotiation',
-    'Closed Won': 'closed_won',
-    'Closed Lost': 'closed_lost',
-  }
-  return map[title] ?? 'lead'
-}
-
 /** Parse dollar value string like "$150,000" to a number */
 function parseCurrency(val: string): number {
   return Number(val.replace(/[$,]/g, '')) || 0
 }
-
-/** Map mock engagement status string to typed status */
-function normalizeEngagementStatus(status: string): Engagement['status'] {
-  const s = status.toLowerCase().replace(/\s+/g, '_')
-  if (s === 'on_track') return 'on_track'
-  if (s === 'at_risk') return 'at_risk'
-  if (s === 'blocked') return 'blocked'
-  if (s === 'completed') return 'completed'
-  // "In Progress" and "Testing" map to on_track
-  return 'on_track'
-}
-
-/** Extract the sector portion from a pipeline card meta like "Defense Contractor - Initial Contact" */
-function parsePipelineSector(meta: string): string {
-  return meta.split('\u2022')[0]?.trim() ?? ''
-}
-
-/** Extract the description portion from a pipeline card meta */
-function parsePipelineDescription(meta: string): string {
-  return meta.split('\u2022')[1]?.trim() ?? ''
-}
-
-function buildSeedOrganizations(): Organization[] {
-  const now = new Date().toISOString()
-  return customers.map((c) => ({
-    id: crypto.randomUUID(),
-    name: c.name,
-    sector: parseSector(c.detail),
-    address: '',
-    cityStateZip: parseCityState(c.detail),
-    website: '',
-    employeeCount: '',
-    createdAt: now,
-  }))
-}
-
-function buildSeedContacts(orgs: Organization[]): Contact[] {
-  // No contact details in mock data, so create empty placeholders per org
-  return orgs.map((org) => ({
-    id: crypto.randomUUID(),
-    organizationId: org.id,
-    name: '',
-    title: '',
-    email: '',
-    phone: '',
-    preferredContact: 'email',
-  }))
-}
-
-function buildSeedOpportunities(orgs: Organization[]): Opportunity[] {
-  const now = new Date().toISOString()
-  const opportunities: Opportunity[] = []
-
-  for (const col of pipelineColumns) {
-    const stage = normalizeStage(col.title)
-    for (const card of col.cards) {
-      // Try to find a matching organization by name
-      const matchedOrg = orgs.find((o) => o.name === card.name)
-      opportunities.push({
-        id: crypto.randomUUID(),
-        organizationId: matchedOrg?.id ?? '',
-        organizationName: card.name,
-        sector: parsePipelineSector(card.meta),
-        stage,
-        value: parseCurrency(card.value),
-        description: parsePipelineDescription(card.meta),
-        source: '',
-        createdAt: now,
-        updatedAt: now,
-      })
-    }
-  }
-
-  return opportunities
-}
-
-function buildSeedEngagements(orgs: Organization[]): Engagement[] {
-  const now = new Date().toISOString()
-  return operationsEngagements.map((e) => {
-    const matchedOrg = orgs.find((o) => o.name === e.customer)
-    return {
-      id: crypto.randomUUID(),
-      organizationId: matchedOrg?.id ?? '',
-      organizationName: e.customer,
-      type: e.type,
-      consultant: e.consultant,
-      status: normalizeEngagementStatus(e.status),
-      hoursUsed: e.hoursUsed,
-      hoursBudget: e.hoursBudget,
-      revenue: parseCurrency(e.revenue),
-      dueDate: '',
-      createdAt: now,
-    }
-  })
-}
-
-function buildSeedAssessments(orgs: Organization[]): Assessment[] {
-  return activeAssessments.map((a) => {
-    const matchedOrg = orgs.find((o) => o.name === a.customer)
-
-    // Build default domain ratings (0 for each domain)
-    const domainRatings: Record<string, number> = {}
-    for (const domain of securityDomains) {
-      domainRatings[domain] = 0
-    }
-
-    // Attach sample findings to the first assessment
-    const findings: Finding[] = sampleFindings.map((f) => ({
-      id: crypto.randomUUID(),
-      severity: f.severity,
-      title: f.title,
-      description: f.desc,
-      nistControl: f.nist,
-    }))
-
-    return {
-      id: crypto.randomUUID(),
-      organizationId: matchedOrg?.id ?? '',
-      organizationName: a.customer,
-      type: a.type,
-      consultant: a.consultant,
-      progress: a.progress,
-      status: a.progress >= 100 ? 'completed' : 'in_progress',
-      domainRatings,
-      findings,
-      startedAt: a.started,
-    }
-  })
-}
-
-function buildSeedTeamMembers(): TeamMember[] {
-  return teamMembersData.map((t) => ({
-    id: crypto.randomUUID(),
-    initials: t.initials,
-    name: t.name,
-    role: t.role,
-    specializations: t.specializations,
-    utilization: t.utilization,
-    activeEngagements: t.activeEngagements,
-    status: t.status,
-  }))
-}
-
-// ─── Seed Initialization ────────────────────────────────────────────────────
-
-function seedIfNeeded(): void {
-  const existingVersion = localStorage.getItem(SEED_VERSION_KEY)
-  if (existingVersion === CURRENT_SEED_VERSION) return
-
-  const orgs = buildSeedOrganizations()
-  const contacts = buildSeedContacts(orgs)
-  const opportunities = buildSeedOpportunities(orgs)
-  const engagements = buildSeedEngagements(orgs)
-  const assessments = buildSeedAssessments(orgs)
-  const team = buildSeedTeamMembers()
-
-  store.set('organizations', orgs)
-  store.set('contacts', contacts)
-  store.set('opportunities', opportunities)
-  store.set('engagements', engagements)
-  store.set('assessments', assessments)
-  store.set('teamMembers', team)
-
-  localStorage.setItem(SEED_VERSION_KEY, CURRENT_SEED_VERSION)
-}
-
-// Run seed check on module load
-seedIfNeeded()
 
 // ─── Organizations ──────────────────────────────────────────────────────────
 
@@ -587,12 +385,11 @@ export function deleteTeamMember(id: string): void {
   store.set('teamMembers', members.filter((m) => m.id !== id))
 }
 
-// ─── Utility: Reset all data (useful for development) ───────────────────────
+// ─── Utility: Reset all data ─────────────────────────────────────────────────
 
 export function resetAllData(): void {
   const keys = Object.keys(localStorage).filter((k) => k.startsWith(STORAGE_PREFIX))
   for (const key of keys) {
     localStorage.removeItem(key)
   }
-  seedIfNeeded()
 }

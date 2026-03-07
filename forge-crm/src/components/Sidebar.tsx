@@ -16,6 +16,7 @@ import type { UserRole, Notification, Tenant } from '../data/mockData'
 import { getOpportunities, getAssessments, getEngagements } from '../lib/api'
 import OnboardingTour from './OnboardingTour'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 import CommandPalette from './CommandPalette'
 import NotificationPanel from './NotificationPanel'
 
@@ -82,6 +83,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { theme, toggle: toggleTheme } = useTheme()
+  const { user } = useAuth()
   const navRef = useRef<HTMLElement>(null)
 
   const [profileOpen, setProfileOpen] = useState(false)
@@ -537,12 +539,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             className={`w-full flex items-center gap-3 ${collapsed ? 'justify-center px-2' : 'px-4'} py-3.5 hover:bg-white/[0.03] transition-colors`}
           >
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-forge-teal/30 to-emerald-500/20 flex items-center justify-center text-forge-teal text-xs font-bold border border-forge-teal/20 flex-shrink-0">
-              BJ
+              {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
             </div>
             {!collapsed && (
               <>
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-xs font-semibold text-white/80 truncate">Brandon Jay</p>
+                  <p className="text-xs font-semibold text-white/80 truncate">{user?.name || 'User'}</p>
                   <p className="text-[10px] text-white/30 truncate">{roleLabels[role]}</p>
                 </div>
                 <ChevronDown size={14} className={`text-white/25 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />

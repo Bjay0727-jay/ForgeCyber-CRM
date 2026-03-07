@@ -115,6 +115,12 @@ export default function Team() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredMembers.length === 0 && (
+          <div className="col-span-full py-12 text-center">
+            <p className="text-sm text-forge-text-muted">No team members yet.</p>
+            <p className="text-xs text-forge-text-faint mt-1">Click "Add Member" above to add your first team member.</p>
+          </div>
+        )}
         {filteredMembers.map((member) => (
           <div key={member.name} className="bg-white rounded-xl border border-forge-border shadow-sm p-5">
             <div className="flex items-start gap-3.5 mb-4">

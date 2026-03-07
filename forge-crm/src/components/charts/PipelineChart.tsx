@@ -111,6 +111,16 @@ export default function PipelineChart() {
       })
   }, [])
 
+  if (data.every(d => d.count === 0 && d.value === 0)) {
+    return (
+      <Card title="Pipeline by Stage">
+        <div className="h-72 flex items-center justify-center">
+          <p className="text-sm text-forge-text-muted">No pipeline data yet. Add opportunities via New Customer Intake.</p>
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <Card title="Pipeline by Stage">
       <div className="h-72">
