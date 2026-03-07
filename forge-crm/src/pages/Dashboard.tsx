@@ -158,7 +158,9 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {engagementRows.map((eng) => {
+              {engagementRows.length === 0 ? (
+                <tr><td colSpan={5} className="py-12 text-center text-sm text-forge-text-muted">No active engagements. Add customers via New Customer Intake to get started.</td></tr>
+              ) : engagementRows.map((eng) => {
                 const display = engagementDisplay(eng.status)
                 return (
                   <tr key={eng.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors cursor-pointer">
@@ -178,7 +180,9 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <Card title="Recent Activity">
           <div className="space-y-4">
-            {activities.map((activity, idx) => {
+            {activities.length === 0 ? (
+              <p className="text-sm text-forge-text-muted text-center py-8">No recent activity. Activity will appear here as your team works.</p>
+            ) : activities.map((activity, idx) => {
               const style = activityIcons[activity.type]
               return (
                 <div key={idx} className="flex items-start gap-3">

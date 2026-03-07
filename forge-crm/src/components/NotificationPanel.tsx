@@ -173,25 +173,12 @@ export default function NotificationPanel({ open, onClose, notifications, onMark
                   </div>
                 )
               })}
-              {/* Extra activity items for a richer feed */}
-              <div className="flex items-start gap-3 px-4 py-3 hover:bg-forge-bg/30 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 bg-purple-500/10">
-                  <FileText size={14} className="text-purple-400" />
+              {activities.length === 0 && (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-forge-text-muted">No recent activity</p>
+                  <p className="text-xs text-forge-text-faint mt-1">Activity will appear here as your team works</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-forge-text leading-relaxed"><strong>SOC 2 Readiness</strong> template exported by Emily Chen</p>
-                  <p className="text-[10px] text-forge-text-faint mt-0.5">Yesterday at 5:30 PM</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 px-4 py-3 hover:bg-forge-bg/30 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 bg-forge-bg">
-                  <LogIn size={14} className="text-forge-text-faint" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-forge-text leading-relaxed"><strong>David Kim</strong> logged in from mobile device</p>
-                  <p className="text-[10px] text-forge-text-faint mt-0.5">Yesterday at 8:15 AM</p>
-                </div>
-              </div>
+              )}
             </div>
           )}
         </div>

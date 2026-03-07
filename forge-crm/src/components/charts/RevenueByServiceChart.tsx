@@ -66,6 +66,16 @@ export default function RevenueByServiceChart() {
       .sort((a, b) => b.value - a.value)
   }, [])
 
+  if (data.length === 0) {
+    return (
+      <Card title="Revenue by Service Type">
+        <div className="h-72 flex items-center justify-center">
+          <p className="text-sm text-forge-text-muted">No revenue data yet. Create engagements to see revenue breakdown.</p>
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <Card title="Revenue by Service Type">
       <div className="h-72">

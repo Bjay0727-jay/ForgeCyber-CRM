@@ -147,7 +147,9 @@ export default function Operations() {
               </tr>
             </thead>
             <tbody>
-              {paginatedEngagements.map((eng) => (
+              {paginatedEngagements.length === 0 ? (
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-forge-text-muted">No engagements yet. Engagements will appear here once customers are onboarded.</td></tr>
+              ) : paginatedEngagements.map((eng) => (
                 <tr key={eng.id} className="border-b border-forge-border/60 last:border-0 hover:bg-forge-bg/30 transition-colors">
                   <td className="py-3 px-4 text-sm font-medium text-forge-text">{eng.organizationName}</td>
                   <td className="py-3 px-4 text-sm text-forge-text-muted">{eng.type}</td>

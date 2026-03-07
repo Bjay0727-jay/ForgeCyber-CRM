@@ -59,6 +59,16 @@ export default function TeamUtilizationChart() {
     }))
   }, [])
 
+  if (data.length === 0) {
+    return (
+      <Card title="Team Utilization">
+        <div className="h-72 flex items-center justify-center">
+          <p className="text-sm text-forge-text-muted">No team members yet. Add members from the Team page.</p>
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <Card title="Team Utilization">
       <div className="h-72">

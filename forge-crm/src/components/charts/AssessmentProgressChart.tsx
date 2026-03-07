@@ -58,6 +58,16 @@ export default function AssessmentProgressChart() {
     }))
   }, [])
 
+  if (data.length === 0) {
+    return (
+      <Card title="Assessment Progress">
+        <div className="h-72 flex items-center justify-center">
+          <p className="text-sm text-forge-text-muted">No assessments in progress. Create one from the Assessments page.</p>
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <Card title="Assessment Progress">
       <div className="h-72">
