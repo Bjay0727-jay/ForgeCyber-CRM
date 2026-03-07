@@ -1,35 +1,38 @@
-# Forge Service Delivery Portal - Dockerfile
-# Build: docker build -t forge-portal:1.0 .
-# Run: docker run -d -p 8080:80 --name forge-portal forge-portal:1.0
+# Forge CRM - Multi-stage Dockerfile
+# Build: docker build -t forge-crm:1.0 .
+# Run: docker run -d -p 8080:80 --name forge-crm forge-crm:1.0
 
-FROM nginx:1.25-alpine
+# ── Stage 1: Build the React app ─────────────────────────────────────────────
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY forge-crm/package.json forge-crm/package-lock.json ./
+RUN npm ci
+
+COPY forge-crm/ ./
+RUN npm run build
+
+# ── Stage 2: Serve with Nginx ────────────────────────────────────────────────
+FROM nginx:1.27-alpine
 
 LABEL maintainer="Forge Cyber Defense <it@forgecyber.com>"
 LABEL version="1.0"
-LABEL description="Forge MSSP Service Delivery Portal"
+LABEL description="Forge CRM - Service Delivery Portal"
 
-# Install curl for healthcheck
 RUN apk add --no-cache curl
 
-# Remove default nginx content
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy application files
-COPY Forge_MSSP_ServiceDelivery_Portal.html /usr/share/nginx/html/index.html
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY docker-nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy custom nginx configuration
-COPY config/docker-nginx.conf /etc/nginx/conf.d/default.conf
-
-# Set proper permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
-# Expose port 80
 EXPOSE 80
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+    CMD curl -f http://localhost/health || exit 1
 
-# Run nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]

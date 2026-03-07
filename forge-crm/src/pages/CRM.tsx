@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useToast } from '../components/Toast'
 import { Plus, Filter, GripVertical } from 'lucide-react'
 import {
@@ -226,6 +227,7 @@ function DroppableColumn({ column, isOverColumn }: DroppableColumnProps) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function CRM() {
+  const navigate = useNavigate()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<Tab>('pipeline')
   const [sectorFilter, setSectorFilter] = useState('all')
@@ -467,7 +469,10 @@ export default function CRM() {
                   ))}
                 </select>
               </div>
-              <button className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors">
+              <button
+                onClick={() => navigate('/intake')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-forge-teal text-white text-sm font-medium hover:bg-forge-teal/90 transition-colors"
+              >
                 <Plus size={15} />
                 Add Customer
               </button>

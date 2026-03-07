@@ -72,6 +72,8 @@ function engagementDisplay(status: string): { label: string; variant: 'success' 
 export default function Dashboard() {
   const navigate = useNavigate()
 
+  // No dependency array — component re-mounts on each navigation (key={location.pathname} in App.tsx)
+  // so stats always reflect the latest localStorage data
   const stats = useMemo(() => {
     const orgs = getOrganizations()
     const assessments = getAssessments()

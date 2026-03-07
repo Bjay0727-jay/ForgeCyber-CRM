@@ -1,8 +1,9 @@
 import { useState, lazy, Suspense } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import ErrorBoundary from './components/ErrorBoundary'
+import ProtectedRoute from './components/ProtectedRoute'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const CRM = lazy(() => import('./pages/CRM'))
@@ -54,16 +55,17 @@ export default function App() {
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/crm" element={<CRM />} />
-                <Route path="/intake" element={<Intake />} />
-                <Route path="/assessments" element={<Assessments />} />
-                <Route path="/workflow" element={<Workflow />} />
-                <Route path="/templates" element={<Templates />} />
-                <Route path="/operations" element={<Operations />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/audit-log" element={<AuditLog />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/crm" element={<ProtectedRoute><CRM /></ProtectedRoute>} />
+                <Route path="/intake" element={<ProtectedRoute><Intake /></ProtectedRoute>} />
+                <Route path="/assessments" element={<ProtectedRoute><Assessments /></ProtectedRoute>} />
+                <Route path="/workflow" element={<ProtectedRoute><Workflow /></ProtectedRoute>} />
+                <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
+                <Route path="/operations" element={<ProtectedRoute><Operations /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+                <Route path="/team" element={<ProtectedRoute requiredRole="admin"><Team /></ProtectedRoute>} />
+                <Route path="/audit-log" element={<ProtectedRoute requiredRole="admin"><AuditLog /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
