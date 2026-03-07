@@ -24,7 +24,7 @@ import type {
 
 const STORAGE_PREFIX = 'forge_crm_'
 const SEED_VERSION_KEY = `${STORAGE_PREFIX}seed_version`
-const CURRENT_SEED_VERSION = '1'
+const CURRENT_SEED_VERSION = '2'
 
 const store = {
   get<T>(key: string): T | null {
