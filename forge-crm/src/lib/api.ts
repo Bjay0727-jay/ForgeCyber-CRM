@@ -17,6 +17,7 @@ import type {
 // ─── LocalStorage Store ─────────────────────────────────────────────────────
 
 const STORAGE_PREFIX = 'forge_crm_'
+const MIGRATION_KEY = `${STORAGE_PREFIX}migrated_v3`
 
 const store = {
   get<T>(key: string): T | null {
@@ -35,6 +36,19 @@ const store = {
   remove(key: string): void {
     localStorage.removeItem(`${STORAGE_PREFIX}${key}`)
   },
+}
+
+// One-time migration: clear old seed data left in browsers from pre-production builds
+if (!localStorage.getItem(MIGRATION_KEY)) {
+  const oldSeedKey = `${STORAGE_PREFIX}seed_version`
+  if (localStorage.getItem(oldSeedKey)) {
+    // Browser has old seed data — wipe it
+    const keys = Object.keys(localStorage).filter((k) => k.startsWith(STORAGE_PREFIX))
+    for (const key of keys) {
+      localStorage.removeItem(key)
+    }
+  }
+  localStorage.setItem(MIGRATION_KEY, '1')
 }
 
 /** Parse dollar value string like "$150,000" to a number */
